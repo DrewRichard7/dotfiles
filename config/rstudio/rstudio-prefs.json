@@ -1,0 +1,47 @@
+{
+    "default_project_location": "/Users/drewrichard/Documents/1 projects/data science 040824/R practice/R fundamentals",
+    "initial_working_directory": "~",
+    "editor_theme": "Mojave Dark (Static)",
+    "posix_terminal_shell": "bash",
+    "jobs_tab_visibility": "shown",
+    "panes": {
+        "quadrants": [
+            "Source",
+            "Console",
+            "TabSet2",
+            "TabSet1"
+        ],
+        "tabSet1": [
+            "Environment",
+            "History",
+            "Connections",
+            "Build",
+            "VCS",
+            "Tutorial",
+            "Presentation"
+        ],
+        "tabSet2": [
+            "Files",
+            "Plots",
+            "Packages",
+            "Help",
+            "Viewer",
+            "Presentations"
+        ],
+        "hiddenTabSet": [],
+        "console_left_on_top": false,
+        "console_right_on_top": true,
+        "additional_source_columns": 0
+    },
+    "auto_detect_indentation": true,
+    "insert_native_pipe_operator": true,
+    "highlight_selected_line": true,
+    "rainbow_parentheses": true,
+    "python_project_environment_automatic_activate": false,
+    "show_terminal_tab": false,
+    "load_workspace": false,
+    "save_workspace": "never",
+    "editor_keybindings": "vim",
+    "relative_line_numbers": true,
+    "copilot_completions_delay": 1000
+}
