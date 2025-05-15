@@ -85,6 +85,9 @@ symbol = " "
 [git_commit]
 tag_symbol = '  '
 
+[git_state]
+unknown = ""
+
 [golang]
 symbol = " "
 
