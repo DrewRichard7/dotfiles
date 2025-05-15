@@ -24,12 +24,12 @@
       "proxy": null,
       "proxy_no_verify": null
     },
-    "enabled_in_text_threads": false
+    "enabled_in_assistant": false
   },
   "detect_venv": {
     "directories": [".venv", "venv"]
   },
-  "agent": {
+  "assistant": {
     "default_model": {
       "provider": "zed.dev",
       "model": "claude-3-5-sonnet-latest"
@@ -80,8 +80,8 @@
     "Python": {
       "language_servers": [
         "ruff",
-        "!pyright",
-        // "python-refactoring",
+        "pyright",
+        "python-refactoring",
         "basedpyright"
       ],
       "format_on_save": "on",
@@ -101,24 +101,6 @@
     }
   },
   "lsp": {
-    "basedpyright": {
-      "binary": {
-        "path": ".venv/bin/basedpyright-langserver",
-        "arguments": ["--stdio"]
-      },
-      "settings": {
-        "python": {
-          "pythonPath": ".venv/bin/python"
-        },
-        "basedpyright.analysis": {
-          "diagnosticMode": "workspace",
-          "reportMissingTypeStubs": false, // This will turn off the warning
-          "inlayHints": {
-            "callArgumentNames": false
-          }
-        }
-      }
-    },
     "ruff": {
       "initialization_options": {
         "settings": {

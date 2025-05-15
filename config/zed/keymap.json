@@ -36,12 +36,12 @@
       "j k": "vim::NormalBefore" // In insert mode, make jk escape to normal mode.
     }
   },
-  {
-    "context": "vim_mode == visual",
-    "bindings": {
-      "j k": "vim::NormalBefore" // In insert mode, make jk escape to normal mode.
-    }
-  },
+  // {
+  //   "context": "vim_mode == visual",
+  //   "bindings": {
+  //     "j k": "vim::NormalBefore" // In insert mode, make jk escape to normal mode.
+  //   }
+  // },
   {
     "context": "Editor && vim_mode == normal && !VimWaiting && !menu",
     "bindings": {

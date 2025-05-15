@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =1
+let g:netrw_dirhist_1='/Users/drewrichard/Documents/projects/nss/nss_projects/lahman-window-DrewRichard7'
+let g:netrw_dirhist_0='/Users/drewrichard/Documents/projects/code/cat_weights_streamlit'
+let g:netrw_dirhist_9='/Users/drewrichard'
+let g:netrw_dirhist_8='/Users/drewrichard/Documents/projects/code/cat_weights_streamlit'
+let g:netrw_dirhist_7='/Users/drewrichard'
+let g:netrw_dirhist_6='/Users/drewrichard/Documents/projects/code/cat_weights_streamlit'
+let g:netrw_dirhist_5='/Users/drewrichard/Documents/projects/code'
+let g:netrw_dirhist_4='/Users/drewrichard/Documents/projects'
+let g:netrw_dirhist_3='/Users/drewrichard/Documents/projects/nss'
+let g:netrw_dirhist_2='/Users/drewrichard/Documents/projects/nss/nss_projects'

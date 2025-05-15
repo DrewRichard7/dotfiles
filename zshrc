@@ -151,6 +151,9 @@ colordict() { (cd ~/resources && nvim colordict.md); }
 myvimrc() { (cd ~/.config/nvim && nvim init.lua); }
 myghosttyrc() { (cd ~/.config/ghostty && nvim config); }
 myweztermrc() { (cd ~/.config/wezterm/ && nvim wezterm.lua); }
+myzshrc() { (cd ~ && nvim .zshrc); }
+passwords() { (cd ~ && nvim .passwords.md); }
+snote() { (cd ~/archive/strata/ && nvim stratanote.md)}
 rez() { exec zsh; } # More efficient than source
 alias dv='deactivate'
 alias zed="open -a /Applications/Zed.app -n"

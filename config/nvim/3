@@ -1,0 +1,39 @@
+return {
+    {
+        "3rd/diagram.nvim",
+        dependencies = {
+            "3rd/image.nvim",
+        },
+        config = function()
+            require("diagram").setup({
+                integrations = {
+                    require("diagram.integrations.markdown"),
+                    require("diagram.integrations.neorg"),
+                },
+                events = {
+                    render_buffer = { "InsertLeave", "BufWinEnter", "TextChanged" },
+                    clear_buffer = { "BufLeave" },
+                },
+                renderer_options = {
+                    mermaid = {
+                        background = transparent, -- nil | "transparent" | "white" | "#hex"
+                        theme = nil,  -- nil | "default" | "dark" | "forest" | "neutral"
+                        scale = 1,    -- nil | 1 (default) | 2  | 3 | ...
+                        width = nil,  -- nil | 800 | 400 | ...
+                        height = nil, -- nil | 600 | 300 | ...
+                    },
+                    plantuml = {
+                        charset = "utf-8",
+                    },
+                    d2 = {
+                        theme_id = 1,
+                    },
+                    gnuplot = {
+                        theme = "dark",
+                        size = "800,600",
+                    },
+                },
+            })
+        end
+    },
+}
