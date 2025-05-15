@@ -86,7 +86,7 @@ symbol = " "
 tag_symbol = '  '
 
 [git_state]
-unknown = ""
+disabled = true
 
 [golang]
 symbol = " "
