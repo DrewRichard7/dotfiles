@@ -33,6 +33,9 @@ Plug 'jiangmiao/auto-pairs'
 Plug 'kis9a/vimsidian'
 " Plug 'github/copilot.vim'
 Plug 'ghifarit53/tokyonight-vim'
+Plug 'mhinz/vim-startify'
+Plug 'tpope/vim-abolish'
+Plug 'tpope/vim-endwise'
 
 call plug#end()
 
@@ -48,3 +51,5 @@ colorscheme tokyonight
 
 " Optional: NERDTree toggle
 nnoremap \ :NERDTreeToggle<CR>
+nnoremap <leader>ff :Files<CR>
+nnoremap <leader>fg :Rg<CR>
