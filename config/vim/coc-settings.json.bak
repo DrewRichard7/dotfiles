@@ -1,0 +1,30 @@
+{
+  "languageserver": {
+    "ruff": {
+      "command": "ruff",
+      "args": ["server"],
+      "filetypes": ["python"],
+      // It's good practice to add rootPatterns for LSPs
+      "rootPatterns": [".git", "pyproject.toml", "ruff.toml", ".ruff.toml"]
+    }
+  },
+
+  // REMOVE python.formatting.provider for now.
+  // Coc should use any attached LSP that offers formatting for Python
+  // if formatOnSave is enabled. Your "languageserver.ruff" offers this.
+  // "python.formatting.provider": "ruff",
+
+  // Keep general Python linting enabled if you want, but specific ruff flags might be redundant
+  // "python.linting.enabled": true,
+
+  // Ensure these are false or removed to avoid triggering a separate Ruff integration
+  "python.linting.ruffEnabled": false,
+  // "python.linting.ruffPath": "ruff", // Remove this as well
+
+  // Keep Pyright for its specific roles
+  "python.linting.pyrightEnabled": true,
+
+  // This will trigger formatting on save, Coc will ask attached LSPs
+  "coc.preferences.formatOnSaveFiletypes": ["python"],
+  "coc.preferences.inlayHint.enable": false
+}

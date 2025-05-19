@@ -40,257 +40,207 @@
 -----------------------------------------------------------------------
 
 return {
-  {
-    "neovim/nvim-lspconfig",
-    enabled = true,
-    dependencies = {
-      {
-        "folke/lazydev.nvim",
-        ft = "lua",
-        opts = {
-          library = {
-            { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-          },
+    {
+        "neovim/nvim-lspconfig",
+        enabled = true,
+        dependencies = {
+            {
+                "folke/lazydev.nvim",
+                ft = "lua",
+                opts = {
+                    library = {
+                        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+                    },
+                },
+            },
+            { "saghen/blink.cmp" },
+            { "williamboman/mason.nvim" },
+            { "williamboman/mason-lspconfig.nvim" },
+            { "WhoIsSethDaniel/mason-tool-installer.nvim" },
         },
-      },
-      {
-        "saghen/blink.cmp"
-      },
-      {
-        "williamboman/mason.nvim"
-      },
-      {
-        "williamboman/mason-lspconfig.nvim"
-      },
-      {
-        "WhoIsSethDaniel/mason-tool-installer.nvim"
-      },
-    },
-    config = function()
-      local capabilities = require("blink.cmp").get_lsp_capabilities()
-      local lsp_flags = {
-        allow_incremental_sync = true,
-        debounce_text_changes = 150,
-      }
-      require("lspconfig").lua_ls.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-        settings = {
-          Lua = {
-            completion = {
-              callSnippet = 'Replace',
-            },
-            runtime = {
-              version = 'LuaJIT',
-            },
-            diagnostics = {
-              disable = { 'trailing-space' },
-            },
-            workspace = {
-              checkThirdParty = false,
-            },
-            doc = {
-              privateName = { '^_' },
-            },
-            telemetry = {
-              enable = false,
-            },
-          },
-        },
-      }
-
-      require("lspconfig").pyright.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-      }
-
-      require("lspconfig").ruff.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-        init_options = {
-          settings = {
-            lineLength = 80,
-          }
-        }
-      }
-
-      require("lspconfig").r_language_server.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-        settings = {
-          r = {
-            lsp = {
-              rich_documentation = true,
-              diagnostics = true, -- Explicitly enable diagnostics
-              lint = {            -- Correctly nested lint settings
-                linters = "lintr::default_linters",
-                -- delay = 1500 -- Or your preferred delay
-              }
+        config = function()
+            local capabilities = require("blink.cmp").get_lsp_capabilities()
+            local lsp_flags = {
+                allow_incremental_sync = true,
+                debounce_text_changes = 150,
             }
-          }
-        }
-      }
 
-      require("lspconfig").rust_analyzer.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-        settings = {
-          ['rust-analyzer'] = {
-            diagnostics = {
-              enable = true,
-            },
-          },
-        },
-      }
+            local function get_lsp_opts(server_specific_opts)
+                local base_opts = {
+                    capabilities = capabilities,
+                    flags = lsp_flags,
+                }
+                return vim.tbl_deep_extend("force", {}, base_opts, server_specific_opts or {})
+            end
 
-      require("lspconfig").yamlls.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-        settings = {
-          yaml = {
-            schemaStore = {
-              enable = true,
-              url = '',
-            },
-          },
-        },
-      }
+            -- Lua
+            local lua_ls_settings = {
+                Lua = {
+                    completion = { callSnippet = "Replace" },
+                    runtime = { version = "LuaJIT" },
+                    diagnostics = { disable = { "trailing-space" } },
+                    workspace = {
+                        checkThirdParty = false,
+                        library = vim.api.nvim_get_runtime_file("lua", true),
+                    },
+                    doc = { privateName = { "^_" } },
+                    telemetry = { enable = false },
+                },
+            }
+            require("lspconfig").lua_ls.setup(get_lsp_opts({ settings = lua_ls_settings }))
 
-      require("lspconfig").jsonls.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-      }
+            -- Python
+            require("lspconfig").pyright.setup(get_lsp_opts())
+            require("lspconfig").ruff.setup(get_lsp_opts({
+                init_options = {
+                    settings = { lineLength = 80 },
+                },
+                -- Disable formatting capability for Ruff LSP to avoid conflicts with none-ls
+                on_attach = function(client, bufnr)
+                    client.server_capabilities.documentFormattingProvider = false
+                end,
+            }))
 
-      require("lspconfig").dotls.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-      }
+            -- R
+            require("lspconfig").r_language_server.setup(get_lsp_opts({
+                settings = {
+                    r = {
+                        lsp = {
+                            rich_documentation = true,
+                            diagnostics = true,
+                            lint = {
+                                linters = "lintr::default_linters",
+                            },
+                        },
+                    },
+                },
+            }))
 
-      require("lspconfig").ts_ls.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-        filetypes = { 'js', 'javascript', 'typescript', 'ojs' },
-      }
-      require('lspconfig').html.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-      }
+            -- Rust
+            require("lspconfig").rust_analyzer.setup(get_lsp_opts({
+                settings = {
+                    ["rust-analyzer"] = {
+                        diagnostics = { enable = true },
+                    },
+                },
+            }))
 
-      require 'lspconfig'.java_language_server.setup {
-        capabilities = capabilities,
-        flags = lsp_flags,
-      }
+            -- HTML
+            require("lspconfig").html.setup(get_lsp_opts())
 
+            -- YAML
+            require("lspconfig").yamlls.setup(get_lsp_opts({
+                settings = {
+                    yaml = {
+                        schemaStore = {
+                            enable = true,
+                            url = "",
+                        },
+                    },
+                },
+            }))
 
+            -- JSON
+            require("lspconfig").jsonls.setup(get_lsp_opts())
 
-      --[[the following function and statements collect existing Lua runtime files in Neovim.
-    Checks if Quarto is installed:
-        If not installed, it notifies the user.
-        If installed, it adds Quarto-specific Lua paths to the runtime.
-    This allows Neovim’s LSP to recognize and provide autocompletion, diagnostics, and other features for Quarto documents.]] --
-      local function get_quarto_resource_path()
-        local function strsplit(s, delimiter)
-          local result = {}
-          for match in (s .. delimiter):gmatch('(.-)' .. delimiter) do
-            table.insert(result, match)
-          end
-          return result
-        end
+            -- TOML
+            require("lspconfig").taplo.setup(get_lsp_opts())
 
-        local f = assert(io.popen('quarto --paths', 'r'))
-        local s = assert(f:read '*a')
-        f:close()
-        return strsplit(s, '\n')[2]
-      end
+            -- LSP Attach Autocommand for Formatting (skip Python, let none-ls handle it)
+            vim.api.nvim_create_autocmd("LspAttach", {
+                group = vim.api.nvim_create_augroup("UserLspAttachFormatting", { clear = true }),
+                callback = function(args)
+                    local client = vim.lsp.get_client_by_id(args.data.client_id)
+                    local bufnr = args.buf
+                    if not client then
+                        return
+                    end
 
-      local lua_library_files = vim.api.nvim_get_runtime_file('', true)
-      local lua_plugin_paths = {}
-      local resource_path = get_quarto_resource_path()
-      if resource_path == nil then
-        vim.notify_once 'quarto not found, lua library files not loaded'
-      else
-        table.insert(lua_library_files, resource_path .. '/lua-types')
-        table.insert(lua_plugin_paths, resource_path .. '/lua-plugin/plugin.lua')
-      end
-
-
-
-      -- LSP attach autocommand
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if not client then return end
-
-          if client.supports_method("textDocument/formatting", 0) then
-            vim.api.nvim_create_autocmd("BufWritePre", {
-              buffer = args.buf,
-              callback = function()
-                vim.lsp.buf.format({ bufnr = args.buf, id = client.id })
-              end,
+                    -- Only set up format-on-save for non-Python filetypes
+                    if vim.bo[bufnr].filetype ~= "python" and client.supports_method("textDocument/formatting") then
+                        vim.api.nvim_create_autocmd("BufWritePre", {
+                            buffer = bufnr,
+                            group = vim.api.nvim_create_augroup("UserLspFormatOnSave_" .. bufnr, { clear = true }),
+                            callback = function()
+                                vim.lsp.buf.format({
+                                    bufnr = bufnr,
+                                    client_id = client.id,
+                                    timeout_ms = 2000,
+                                })
+                            end,
+                        })
+                    end
+                end,
             })
-          end
+
+            -- Keymap for Manual Formatting (let none-ls handle Python)
+            vim.keymap.set({ "n", "v" }, "<leader>lf", function()
+                if vim.bo.filetype == "python" then
+                    vim.lsp.buf.format({
+                        filter = function(client) return client.name == "null-ls" end,
+                        timeout_ms = 2000,
+                    })
+                else
+                    vim.lsp.buf.format({ timeout_ms = 2000 })
+                end
+            end, { desc = "[L]SP [F]ormat" })
+
+            -- Mason Setup
+            require("mason").setup({
+                ui = {
+                    icons = {
+                        package_installed = "✓",
+                        package_pending = "➜",
+                        package_uninstalled = "✗",
+                    },
+                },
+            })
+
+            require("mason-lspconfig").setup({
+                automatic_installation = true,
+                ensure_installed = {
+                    "lua_ls",
+                    "pyright",
+                    "ruff",
+                    "r_language_server",
+                    "rust_analyzer",
+                    "html",
+                    "yamlls",
+                    "jsonls",
+                    "taplo",
+                },
+            })
+
+            require("mason-tool-installer").setup({
+                ensure_installed = {
+                    "ruff",
+                    "stylua",
+                    "isort",
+                    "tree-sitter-cli",
+                    "r-languageserver",
+                },
+                auto_update = true,
+            })
+
+            -- Improved Hover and Signature Help Handlers, Diagnostic Config
+            vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+                border = "rounded",
+                max_width = 80,
+            })
+            vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+                border = "rounded",
+                max_width = 80,
+            })
+            vim.diagnostic.config({
+                virtual_text = true,
+                signs = true,
+                underline = true,
+                update_in_insert = false,
+                severity_sort = true,
+                float = {
+                    border = "rounded",
+                },
+            })
         end,
-      })
-
-      vim.keymap.set({ "n", "v" }, '<leader>lf', vim.lsp.buf.format, { desc = '[l]sp [f]ormat' })
-
-      -- Set up Mason
-      require("mason").setup({
-        ui = {
-          icons = {
-            package_installed = "✓",
-            package_pending = "➜",
-            package_uninstalled = "✗",
-          },
-        },
-      })
-
-      require("mason-lspconfig").setup({
-        automatic_installation = true,
-        ensure_installed = {
-          "lua_ls",
-          "rust_analyzer",
-          "pyright",
-          "r_language_server",
-          "yamlls",
-          "jsonls",
-          "ruff",
-        },
-      })
-
-      -- More comprehensive tool installation
-      require("mason-tool-installer").setup({
-        ensure_installed = {
-          -- "black",
-          "ruff",
-          "stylua",
-          "shfmt",
-          "isort",
-          "tree-sitter-cli",
-          "jupytext",
-          "r-languageserver"
-        },
-        auto_update = true,
-      })
-      -- vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover,
-      --   { border = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' } })
-      -- vim.lsp.handlers['textDocument/signatureHelp'] =
-      --     vim.lsp.with(vim.lsp.handlers.signature_help, { border = { '╭', '─', '╮', '│', '╯', '─', '╰', '│' } })
-      -- Improved hover and signature help handlers
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = "rounded",
-        max_width = 80,
-      })
-      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        border = "rounded",
-        max_width = 80,
-      })
-      vim.diagnostic.config({
-        float = {
-          border = "rounded", -- Or your preferred style
-          -- source = "always",
-        },
-      })
-    end
-  },
+    },
 }

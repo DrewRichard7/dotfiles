@@ -1,0 +1,21 @@
+{
+  // --- Settings for @yaegassy/coc-ruff extension ---
+  "ruff.enable": true,
+  "ruff.nativeServer": true,
+  "ruff.disableDocumentFormatting": false,
+  "ruff.disableHover": false,
+  "ruff.useDetectRuffCommand": true,
+  "ruff.client.codeAction.showDocumantaion.enable": true,
+  "ruff.trace.server": "off",
+
+  // --- Settings for coc-pyright ---
+  "python.linting.pyrightEnabled": true,
+  // Explicitly ENABLE Pyright's inlay hints
+  "python.analysis.inlayHints.functionReturnTypes.enabled": true,
+  "python.analysis.inlayHints.variableTypes.enabled": true,
+  "python.analysis.inlayHints.parameterNames.enabled": "all", // Or "literals" or "none"
+
+  // --- General Coc Preferences ---
+  "coc.preferences.formatOnSaveFiletypes": ["python"],
+  "coc.preferences.inlayHint.enable": true // ENABLE global inlay hints
+}

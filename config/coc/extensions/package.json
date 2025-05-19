@@ -1,1 +1,6 @@
-{"dependencies":{}}
+{
+  "dependencies": {
+    "coc-pyright": ">=1.1.400",
+    "@yaegassy/coc-ruff": ">=0.8.0"
+  }
+}

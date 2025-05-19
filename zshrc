@@ -62,6 +62,9 @@ zinit wait lucid for \
 # Load only essential annexes
 zinit wait"2" lucid light-mode for \
   zdharma-continuum/zinit-annex-bin-gem-node
+#
+# Bind Tab to accept autosuggestion
+bindkey '^I' autosuggest-accept
 
 # 6. Restore original directory
 cd "$ZSH_ORIG_PWD" 2>/dev/null || true
@@ -142,7 +145,7 @@ function obsidian() {
 
 
 
-# Quick open files
+# Quick open files and shell (subshell) functions
 todo() { (cd ~/areas/Obsidian/ && nvim .todo.md); }
 qn() { (cd ~/areas/Obsidian && nvim quicknote.md); }
 cheat() { (cd ~ && nvim .cheatsheet.md); }
@@ -155,6 +158,9 @@ myzshrc() { (cd ~ && nvim .zshrc); }
 passwords() { (cd ~ && nvim .passwords.md); }
 snote() { (cd ~/archive/strata/ && nvim stratanote.md)}
 rez() { exec zsh; } # More efficient than source
+timecard() { (cd ~/archive/strata/stratalog/ && uv run main.py); }
+show_timecard() { (cd ~/archive/strata/stratalog/ && uv run main.py --report-only); }
+
 alias dv='deactivate'
 alias zed="open -a /Applications/Zed.app -n"
 
