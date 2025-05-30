@@ -1,15 +1,15 @@
 return {
   {
-    'MeanderingProgrammer/render-markdown.nvim',
-    enabled = true,
-    ft = { 'md', 'markdown', 'qmd', 'quarto' },
+    "MeanderingProgrammer/render-markdown.nvim",
+    enabled = false,
+    ft = { "md", "markdown", "qmd", "quarto" },
     -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" }, -- if you prefer nvim-web-devicons
     ---@module 'render-markdown'
     ---@type render.md.UserConfig
     config = function()
-      require('render-markdown').setup({
-        file_types = { 'markdown', 'quarto' },
+      require("render-markdown").setup({
+        file_types = { "markdown", "quarto" },
 
         completions = {
           -- Settings for blink.cmp completions source
@@ -21,7 +21,7 @@ return {
           filter = {
             callout = function()
               -- example to exclude obsidian callouts
-              return value.category ~= 'obsidian'
+              return value.category ~= "obsidian"
               -- return true
             end,
             checkbox = function()
@@ -32,13 +32,13 @@ return {
         heading = {
           enable = true,
           levels = { 1, 2, 3, 4, 5, 6 },
-          icons = { "󰊠󰁕 ", "󰊠󰶻 ", "󰊠󰐃 ", "󰐃 ", "󰗉 ", "󰶼 ", },
+          icons = { "󰊠󰁕 ", "󰊠󰶻 ", "󰊠󰐃 ", "󰐃 ", "󰗉 ", "󰶼 " },
           conceal = true,
         },
         checkbox = {
           enabled = false,
-        }
+        },
       })
-    end
-  }
+    end,
+  },
 }

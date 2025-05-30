@@ -17,7 +17,7 @@
     "show": true
   },
   "theme": "Tokyo Night",
-  "icon_theme": "Material Icon Theme",
+  "icon_theme": "Catppuccin Mocha",
   "edit_predictions": {
     "mode": "subtle",
     "copilot": {
@@ -52,11 +52,7 @@
   "ui_font_size": 16,
   "buffer_font_size": 16,
   "buffer_font_family": "Monaspace Neon",
-  "buffer_font_fallbacks": [
-    "MesloLGS Nerd Font",
-    "SF Mono",
-    "Hack Nerd Font Mono"
-  ],
+  "buffer_font_fallbacks": ["MesloLGS Nerd Font", "SF Mono", "Hack Nerd Font Mono"],
   "centered_layout": {
     "left_padding": 0.2,
     "right_padding": 0.2
@@ -80,9 +76,8 @@
     "Python": {
       "language_servers": [
         "ruff",
-        "!pyright",
+        "pyright"
         // "python-refactoring",
-        "basedpyright"
       ],
       "format_on_save": "on",
       "formatter": [

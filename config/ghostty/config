@@ -5,9 +5,9 @@ background-blur-radius = 20
 # theme = Wez
 # theme = catppuccin-macchiato
 # theme = catppuccin-mocha
-theme = tokyonight
+# theme = tokyonight
 # theme = Aurora
-# theme = Builtin Pastel Dark
+theme = Builtin Pastel Dark
 # theme = Cobalt Neon
 # theme = rose-pine-moon
 # cursor features
