@@ -92,10 +92,10 @@ _load_fzf() {
   export FZF_CTRL_T_OPTS="--preview '[[ -d {} ]] && eza --tree --color=always {} | head -200 || bat -n --color=always --line-range :500 {}'"
   export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always {} | head -200'"
   [[ -f ~/fzf-git.sh/fzf-git.sh ]] && source ~/fzf-git.sh/fzf-git.sh
-  
+
   # Replace the loader function with the actual command
   unfunction _load_fzf fzf
-  
+
   # Execute the current fzf command
   command fzf "$@"
 }
@@ -126,11 +126,12 @@ if command -v eza &>/dev/null; then
 fi
 
 # Neovim shortcuts
-alias v='nvim'
+alias nv='nvim'
+alias v='NVIM_APPNAME=vnvim nvim'
 alias vl='NVIM_APPNAME=nvim-lazyvim nvim'
 alias vq='NVIM_APPNAME=nvim-quarto nvim'
-alias vk='NVIM_APPNAME=nvim-kickstart nvim'
-alias vc='NVIM_APPNAME=nvim-chad nvim'
+alias vk='NVIM_APPNAME=kickstart.nvim nvim'
+alias vp='NVIM_APPNAME=prime nvim'
 
 # Navigate to iCloud Drive
 # Function to navigate to iCloud Drive
@@ -146,17 +147,17 @@ function obsidian() {
 
 
 # Quick open files and shell (subshell) functions
-todo() { (cd ~/areas/Obsidian/ && nvim .todo.md); }
-qn() { (cd ~/areas/Obsidian && nvim quicknote.md); }
-cheat() { (cd ~ && nvim .cheatsheet.md); }
-pydict() { (cd ~ && nvim .pydict.md); }
-colordict() { (cd ~/resources && nvim colordict.md); }
-myvimrc() { (cd ~/.config/nvim && nvim init.lua); }
-myghosttyrc() { (cd ~/.config/ghostty && nvim config); }
-myweztermrc() { (cd ~/.config/wezterm/ && nvim wezterm.lua); }
-myzshrc() { (cd ~ && nvim .zshrc); }
-passwords() { (cd ~ && nvim .passwords.md); }
-snote() { (cd ~/archive/strata/ && nvim stratanote.md)}
+todo() { (cd ~/areas/Obsidian/ && nv .todo.md); }
+qn() { (cd ~/areas/Obsidian && nv quicknote.md); }
+cheat() { (cd ~ && nv .cheatsheet.md); }
+pydict() { (cd ~ && nv .pydict.md); }
+colordict() { (cd ~/resources && nv colordict.md); }
+myvimrc() { (cd ~/.config/fileconfig-nvim/ && nv init.lua); }
+myghosttyrc() { (cd ~/.config/ghostty && nv config); }
+myweztermrc() { (cd ~/.config/wezterm/ && nv wezterm.lua); }
+myzshrc() { (cd ~ && nv .zshrc); }
+passwords() { (cd ~ && nv .passwords.md); }
+snote() { (cd ~/archive/strata/ && nv stratanote.md)}
 rez() { exec zsh; } # More efficient than source
 timecard() { (cd ~/archive/strata/stratalog/ && uv run main.py); }
 show_timecard() { (cd ~/archive/strata/stratalog/ && uv run main.py --report-only); }
@@ -202,7 +203,7 @@ if [[ -s "$NVM_DIR/nvm.sh" ]]; then
     . "$NVM_DIR/nvm.sh"
     nvm "$@"
   }
-  
+
   for cmd in node npm npx; do
     eval "$cmd() { unset -f nvm node npm npx; . \"\$NVM_DIR/nvm.sh\"; $cmd \"\$@\"; }"
   done
