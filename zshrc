@@ -15,6 +15,11 @@ export PATH="$HOME/.codeium/windsurf/bin:$HOME/opt/lua-5.1/bin:/opt/homebrew/opt
 export EDITOR=nvim
 export DB_PASSWORD="postgres"
 
+# symlinks
+[ -L ~/.tmux ] || ln -s ~/.dotfiles/tmux ~/.tmux
+[ -L ~/.tmux.conf ] || ln -s ~/.dotfiles/tmux.conf ~/.tmux.conf
+
+
 # 3. Lazy-load Functions (reduces initial load time)
 
 # Python Virtualenv Auto-Loader - Optimized to run only when needed
@@ -122,7 +127,7 @@ vol() {
 
 # Use eza only if it exists, otherwise fallback to ls
 if command -v eza &>/dev/null; then
-  alias ls="eza --color=always --git --no-filesize --icons=always --no-time --no-user --no-permissions"
+  alias ls="eza --color=always --git --no-filesize --icons=always --no-time --no-user --all --no-permissions"
 fi
 
 # Neovim shortcuts
@@ -167,9 +172,9 @@ alias dv='deactivate'
 alias zed="open -a /Applications/Zed.app -n"
 
 # Git shortcuts
-alias gs="git status"
+alias st="git status"
 alias gaa="git add -A"
-alias gcm="git commit -m"
+alias gc="git commit -m"
 alias gp="git push"
 alias gpl="git pull"
 
