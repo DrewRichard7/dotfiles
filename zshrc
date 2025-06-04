@@ -127,7 +127,7 @@ vol() {
 
 # Use eza only if it exists, otherwise fallback to ls
 if command -v eza &>/dev/null; then
-  alias ls="eza --color=always --git --no-filesize --icons=always --no-time --no-user --all --no-permissions"
+  alias ls="eza -l --color=always --git --no-filesize --icons=always --no-time --no-user --all --no-permissions"
 fi
 
 # Neovim shortcuts

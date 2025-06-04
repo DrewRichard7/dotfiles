@@ -7,9 +7,10 @@ background-blur-radius = 20
 # theme = catppuccin-mocha
 # theme = tokyonight
 # theme = Aurora
-theme = Builtin Pastel Dark
+# theme = Builtin Pastel Dark
 # theme = Cobalt Neon
 # theme = rose-pine-moon
+theme = "easy-eyes"
 # cursor features
 shell-integration-features = no-cursor
 cursor-color = 97E5F5
@@ -23,7 +24,7 @@ window-padding-x = 15,5
 window-position-y = 500
 window-save-state = always
 # font
-font-size = 18 
+font-size = 18
 # font-feature = -calt # disable programming ligatures
 font-family = Monaspace Neo
 

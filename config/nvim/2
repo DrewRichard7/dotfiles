@@ -80,145 +80,8 @@ function ColorMyPencils(color)
 	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
 end
---=========================================================
-------------------- MY CUSTOM COLORTHEME __________________
---=========================================================
-local use_mytheme = true -- set to true to enable
 
-local function apply_mytheme()
-	local colors = {
-		fg = "#ccc9c0",
-		cursor = "#aeafad",
-		comment = "#6A9955",
-		keyword = "#569CD6",
-		string = "#CE9178",
-		number = "#B5CEA8",
-		func = "#DED157",
-		type = "#4EC9B0",
-		variable = "#9CDCFE",
-		constant = "#4FC1FF",
-		operator = "#f200ff",
-		error = "#f47171",
-		warning = "#cca700",
-		info = "#75beff",
-		hint = "#81c164",
-		visual = "#fdef9f",
-		linehl = "#4a442c",
-		search = "#515c6a",
-		matchparen = "#006400",
-	}
-
-	local set = vim.api.nvim_set_hl
-
-	vim.cmd("highlight clear")
-	if vim.fn.exists("syntax_on") then
-		vim.cmd("syntax reset")
-	end
-	vim.o.termguicolors = true
-	vim.g.colors_name = "mytheme"
-
-	-- UI (all bg = "NONE" for transparency)
-	set(0, "Normal", { fg = colors.fg, bg = "NONE" })
-	set(0, "NormalNC", { fg = colors.fg, bg = "NONE" })
-	set(0, "NormalFloat", { fg = colors.fg, bg = "NONE" })
-	set(0, "FloatBorder", { fg = "#00DD96", bg = "NONE" })
-	set(0, "TelescopeBorder", { fg = "#00DD96", bg = "NONE" })
-	set(0, "Cursor", { fg = "NONE", bg = colors.cursor })
-	set(0, "CursorLine", { bg = "NONE" })
-	set(0, "CursorColumn", { bg = "NONE" })
-	set(0, "Visual", { bg = "NONE", underline = true, reverse = true })
-	set(0, "LineNr", { fg = "#a2905e", bg = "NONE" })
-	set(0, "CursorLineNr", { fg = "#79dca5", bg = "NONE" })
-	set(0, "VertSplit", { fg = "#ffe96e", bg = "NONE" })
-	set(0, "StatusLine", { fg = colors.fg, bg = "NONE" })
-	set(0, "StatusLineNC", { fg = "#fffae9", bg = "NONE" })
-	set(0, "Pmenu", { fg = colors.fg, bg = "NONE" })
-	set(0, "PmenuSel", { fg = "#fffae9", bg = "#333333" })
-	set(0, "Search", { bg = colors.search, fg = colors.fg })
-	set(0, "IncSearch", { bg = colors.search, fg = colors.fg })
-	set(0, "MatchParen", { bg = colors.matchparen, underline = true })
-	set(0, "Error", { fg = colors.error, bold = true, bg = "NONE" })
-	set(0, "WarningMsg", { fg = colors.warning, bold = true, bg = "NONE" })
-	set(0, "InfoMsg", { fg = colors.info, bg = "NONE" })
-	set(0, "HintMsg", { fg = colors.hint, bg = "NONE" })
-
-	-- Syntax
-	set(0, "Comment", { fg = colors.comment, italic = true, bg = "NONE" })
-	set(0, "Constant", { fg = colors.constant, bg = "NONE" })
-	set(0, "String", { fg = colors.string, bg = "NONE" })
-	set(0, "Character", { fg = colors.string, bg = "NONE" })
-	set(0, "Number", { fg = colors.number, bg = "NONE" })
-	set(0, "Boolean", { fg = colors.number, bg = "NONE" })
-	set(0, "Identifier", { fg = colors.variable, bg = "NONE" })
-	set(0, "Function", { fg = colors.func, italic = true, bg = "NONE" })
-	set(0, "Statement", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Conditional", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Repeat", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Label", { fg = "#C8C8C8", bg = "NONE" })
-	set(0, "Operator", { fg = colors.operator, bg = "NONE" })
-	set(0, "Keyword", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Exception", { fg = colors.keyword, bg = "NONE" })
-	set(0, "PreProc", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Type", { fg = colors.type, bg = "NONE" })
-	set(0, "StorageClass", { fg = colors.type, bg = "NONE" })
-	set(0, "Structure", { fg = "#3acfa7", bold = true, bg = "NONE" })
-	set(0, "Typedef", { fg = colors.type, bg = "NONE" })
-	set(0, "Special", { fg = "#D7BA7D", bg = "NONE" })
-	set(0, "Underlined", { underline = true, bg = "NONE" })
-	set(0, "Ignore", { fg = "#8c8c8c", bg = "NONE" })
-	set(0, "ErrorMsg", { fg = colors.error, bold = true, bg = "NONE" })
-	set(0, "Todo", { fg = "#fffae9", bg = "#653723", bold = true })
-
-	-- Treesitter (nvim 0.5+)
-	set(0, "@comment", { fg = colors.comment, italic = true, bg = "NONE" })
-	set(0, "@keyword", { fg = colors.keyword, bg = "NONE" })
-	set(0, "@string", { fg = colors.string, bg = "NONE" })
-	set(0, "@number", { fg = colors.number, bg = "NONE" })
-	set(0, "@function", { fg = colors.func, italic = true, bg = "NONE" })
-	set(0, "@type", { fg = colors.type, bg = "NONE" })
-	set(0, "@variable", { fg = colors.variable, bg = "NONE" })
-	set(0, "@constant", { fg = colors.constant, bg = "NONE" })
-	set(0, "@operator", { fg = colors.operator, bg = "NONE" })
-	set(0, "@property", { fg = "#b790ff", italic = true, bg = "NONE" })
-	set(0, "@field", { fg = "#42a3ff", italic = true, bg = "NONE" })
-	set(0, "@parameter", { fg = "#8be4d8", italic = true, bg = "NONE" })
-	set(0, "@enum", { fg = "#3dbbff", bold = true, bg = "NONE" })
-	set(0, "@enumMember", { fg = "#3dbbff", bg = "NONE" })
-	set(0, "@interface", { fg = "#ffea00", bg = "NONE" })
-	set(0, "@namespace", { fg = "#51b7a3", bg = "NONE" })
-	set(0, "@class", { fg = "#00d885", bg = "NONE" })
-	set(0, "@struct", { fg = "#3acfa7", bold = true, bg = "NONE" })
-
-	-- Diagnostics
-	set(0, "DiagnosticError", { fg = colors.error, bg = "NONE" })
-	set(0, "DiagnosticWarn", { fg = colors.warning, bg = "NONE" })
-	set(0, "DiagnosticInfo", { fg = colors.info, bg = "NONE" })
-	set(0, "DiagnosticHint", { fg = colors.hint, bg = "NONE" })
-
-	-- Git
-	set(0, "DiffAdd", { bg = "NONE" })
-	set(0, "DiffChange", { bg = "NONE" })
-	set(0, "DiffDelete", { bg = "NONE" })
-	set(0, "DiffText", { bg = "NONE" })
-
-	-- Terminal colors
-	vim.g.terminal_color_0 = "#000000"
-	vim.g.terminal_color_1 = "#cd3131"
-	vim.g.terminal_color_2 = "#0dbc79"
-	vim.g.terminal_color_3 = "#e5e510"
-	vim.g.terminal_color_4 = "#2472c8"
-	vim.g.terminal_color_5 = "#bc3fbc"
-	vim.g.terminal_color_6 = "#11a8cd"
-	vim.g.terminal_color_7 = "#e5e5e5"
-	vim.g.terminal_color_8 = "#666666"
-	vim.g.terminal_color_9 = "#f14c4c"
-	vim.g.terminal_color_10 = "#23d18b"
-	vim.g.terminal_color_11 = "#f5f543"
-	vim.g.terminal_color_12 = "#3b8eea"
-	vim.g.terminal_color_13 = "#d670d6"
-	vim.g.terminal_color_14 = "#29b8db"
-	vim.g.terminal_color_15 = "#e5e5e5"
-end
+-- vim.cmd.colorscheme("ron")
 -- =====================
 -- 2. PLUGIN MANAGER: lazy.nvim
 -- =====================
@@ -253,7 +116,7 @@ require("lazy").setup({
 	-- Colorscheme: Kanagawa (enabled)
 	{
 		"rebelot/kanagawa.nvim",
-		enabled = false,
+		enabled = true,
 		priority = 1000,
 		config = function()
 			require("kanagawa").setup({
@@ -282,25 +145,12 @@ require("lazy").setup({
 	-- Colorizer
 	{ "NvChad/nvim-colorizer.lua", opts = { filetypes = { "*" }, user_default_options = { mode = "background" } } },
 	-- notification handler
-	-- Add this to your lazy.nvim plugin list
 	{
 		"j-hui/fidget.nvim",
-		event = "VimEnter",
 		opts = {
-			progress = {
-				display = {
-					render_limit = 1,
-					done_ttl = 2,
-					done_icon = "✔",
-				},
-			},
-			notification = {
-				override_vim_notify = true,
-			},
-		},
-		config = function(_, opts)
-			require("fidget").setup(opts)
-		end,
+    notification = {
+         override_vim_notify = true, -- Override vim.notify with fidget notifications
+    }
 	},
 	-- Telescope and extensions
 	{
@@ -314,7 +164,7 @@ require("lazy").setup({
 			require("telescope").setup({ extensions = { fzf = {} } })
 			require("telescope").load_extension("fzf")
 			require("telescope").load_extension("harpoon")
-			-- require("telescope").load_extension("fidget")
+			require("telescope").load_extension("fidget")
 			-- Multigrep extension
 			local multigrep_loader = require("telescope.pickers")
 				and require("telescope.finders")
@@ -633,7 +483,7 @@ require("lazy").setup({
 		config = function(_, opts)
 			require("copilot").setup(opts)
 			-- You may need to run :Copilot auth or :Copilot setup
-			vim.keymap.set("i", "<C-y>", function()
+			vim.keymap.set("i", "<C-i>", function()
 				require("copilot.suggestion").accept_line()
 			end)
 		end,
@@ -765,25 +615,9 @@ require("lazy").setup({
 	},
 	-- Mini.nvim (statusline, surround, etc.)
 	{
-		"echasnovski/mini.statusline",
-		enabled = true,
-		event = "VeryLazy",
+		"echasnovski/mini.nvim",
 		config = function()
 			require("mini.statusline").setup({ use_icons = true })
-
-			-- Custom highlights for each mode (transparent backgrounds)
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = "#ccc9c0", bg = "NONE", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = "#1e1e1e", bg = "#DED157", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = "#1e1e1e", bg = "#569CD6", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = "#1e1e1e", bg = "#CE9178", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = "#1e1e1e", bg = "#4EC9B0", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = "#1e1e1e", bg = "#75beff", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = "#6A9955", bg = "NONE", italic = true })
-
-			-- Optional: tweak other statusline sections for consistency
-			vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = "#DED157", bg = "NONE" })
-			vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = "#569CD6", bg = "NONE" })
-			vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = "#4EC9B0", bg = "NONE" })
 		end,
 	},
 	-- Snacks (zen, etc.)
@@ -1371,10 +1205,6 @@ endfunction
 		end,
 	},
 })
--- for my custom colortheme:
-if use_mytheme then
-	apply_mytheme()
-end
 -- restore it
 -- =====================
 -- 3. KEYMAPS & AUTOCMDS
