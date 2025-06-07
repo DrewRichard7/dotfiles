@@ -285,13 +285,15 @@ require("lazy").setup({
 	-- Add this to your lazy.nvim plugin list
 	{
 		"j-hui/fidget.nvim",
-		event = "VimEnter",
 		opts = {
 			progress = {
 				display = {
 					render_limit = 1,
-					done_ttl = 2,
+					done_ttl = 1,
 					done_icon = "✔",
+				},
+				ignore = {
+					"lua_ls",
 				},
 			},
 			notification = {
@@ -314,17 +316,13 @@ require("lazy").setup({
 			require("telescope").setup({ extensions = { fzf = {} } })
 			require("telescope").load_extension("fzf")
 			require("telescope").load_extension("harpoon")
-			-- require("telescope").load_extension("fidget")
+			require("telescope").load_extension("fidget")
 			-- Multigrep extension
 			local multigrep_loader = require("telescope.pickers")
 				and require("telescope.finders")
 				and require("telescope.make_entry")
 				and require("telescope.config").values
 				and function()
-					local pickers = require("telescope.pickers")
-					local finders = require("telescope.finders")
-					local make_entry = require("telescope.make_entry")
-					local conf = require("telescope.config").values
 					local function live_multigrep(opts)
 						opts = opts or {}
 						opts.cwd = opts.cwd or vim.uv.cwd()
@@ -469,7 +467,50 @@ require("lazy").setup({
 				local base_opts = { capabilities = capabilities, flags = lsp_flags }
 				return vim.tbl_deep_extend("force", {}, base_opts, server_specific_opts or {})
 			end
+			vim.api.nvim_create_autocmd("LspAttach", {
+				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
+				callback = function(event)
+					-- A helper function to simplify setting keymaps.
+					local map = function(keys, func, desc, mode)
+						mode = mode or "n"
+						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+					end
 
+					--
+					-- Go-to Commands
+					--
+					-- Jumps to the definition of the word under your cursor.
+					map("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
+
+					-- Jumps to the implementation of the word under yourcursor.
+					-- This is the mapping you requested.
+					map("gi", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
+
+					-- Jumps to the type definition of the word under your cursor.
+					map("gy", vim.lsp.buf.type_definition, "[G]oto [T]ype Definition")
+
+					-- Finds references for the word under your cursor in a Telescope list.
+					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
+
+					--
+					-- Action Commands
+					--
+					-- Renames the variable under your cursor across files.
+					map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
+
+					-- Executes a code action, like refactoring or fixing a diagnostic.
+					map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
+
+					--
+					-- Informational Commands
+					--
+					-- Shows hover documentation for the word under your cursor.
+					map("K", vim.lsp.buf.hover, "Hover Documentation")
+
+					-- Shows signature help for the function call you are in.
+					map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
+				end,
+			})
 			-- LSP server setups
 			require("lspconfig").lua_ls.setup(get_lsp_opts({
 				settings = {
@@ -608,7 +649,81 @@ require("lazy").setup({
 			})
 		end,
 	},
+	{ -- highlight markdown headings and code blocks etc.
+		"lukas-reineke/headlines.nvim",
+		enabled = true,
+		dependencies = "nvim-treesitter/nvim-treesitter",
+		config = function()
+			require("headlines").setup({
+				quarto = {
+					query = vim.treesitter.query.parse("markdown", [[(fenced_code_block) @codeblock]]),
+					codeblock_highlight = "CodeBlock",
+					treesitter_language = "markdown",
+				},
+				markdown = {
+					query = vim.treesitter.query.parse("markdown", [[(fenced_code_block) @codeblock]]),
+					codeblock_highlight = "CodeBlock",
+				},
+			})
+		end,
+	},
+	{
+		"MeanderingProgrammer/render-markdown.nvim",
+		enabled = true,
+		ft = { "md", "markdown", "qmd", "quarto", "copilot-chat" },
+		-- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+		dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" }, -- if you prefer nvim-web-devicons
+		---@module 'render-markdown'
+		---@type render.md.UserConfig
+		config = function()
+			require("render-markdown").setup({
+				file_types = { "markdown", "quarto", "copilot-chat" },
+				completions = { -- Settings for blink.cmp completions source
+					blink = { enabled = true }, -- Settings for coq_nvim completions source
+					coq = { enabled = false }, -- Settings for in-process language server completions
+					lsp = { enabled = false },
+					filter = {
+						callout = function() -- example to exclude obsidian callouts
+							return value.category ~= "obsidian" -- return true
+						end,
+						checkbox = function()
+							return true
+						end,
+					},
+				},
+				heading = {
+					enable = true,
+					levels = { 1, 2, 3, 4, 5, 6 },
+					icons = { "󰊠󰁕 ", "󰊠󰶻 ", "󰊠󰐃 ", "󰐃 ", "󰗉 ", "󰶼 " },
+					conceal = true,
+				},
+				checkbox = {
+					enabled = false,
+				},
+			})
+		end,
+	},
 	-- GitHub Copilot
+	{
+		"CopilotC-Nvim/CopilotChat.nvim",
+		dependencies = {
+			{ "zbirenbaum/copilot.lua" },
+			{ "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
+		},
+		opts = {
+			-- See Configuration section for options
+		},
+		vim.keymap.set("n", "<leader>cp", ":CopilotChatToggle<CR>", { desc = "Toggle Copilot Chat" }),
+		-- Quick chat keybinding
+		vim.keymap.set("n", "<leader>cq", function()
+			local input = vim.fn.input("Quick Chat: ")
+			if input ~= "" then
+				require("CopilotChat").ask(input, {
+					selection = require("CopilotChat.select").buffer,
+				})
+			end
+		end, { desc = "CopilotChat - Quick chat" }),
+	},
 	{
 		"zbirenbaum/copilot.lua",
 		cmd = "Copilot",
@@ -633,7 +748,7 @@ require("lazy").setup({
 		config = function(_, opts)
 			require("copilot").setup(opts)
 			-- You may need to run :Copilot auth or :Copilot setup
-			vim.keymap.set("i", "<C-y>", function()
+			vim.keymap.set("i", "<C-f>", function()
 				require("copilot.suggestion").accept_line()
 			end)
 		end,
@@ -769,21 +884,54 @@ require("lazy").setup({
 		enabled = true,
 		event = "VeryLazy",
 		config = function()
-			require("mini.statusline").setup({ use_icons = true })
-
+			require("mini.statusline").setup({
+				use_icons = true,
+				content = {
+					active = function(args)
+						args = args or {}
+						local mode, diagnostics, filename, fileinfo, location =
+							MiniStatusline.section_mode(args),
+							MiniStatusline.section_diagnostics(args),
+							MiniStatusline.section_filename(args),
+							MiniStatusline.section_fileinfo(args),
+							MiniStatusline.section_location(args)
+						return MiniStatusline.combine_groups({
+							{ hl = "MiniStatuslineMode", strings = { mode } },
+							{ hl = "MiniStatuslineDevinfo", strings = { diagnostics } },
+							"%<", -- Mark general truncate point
+							{ hl = "MiniStatuslineFilename", strings = { filename } },
+							{ hl = "MiniStatuslineFileinfo", strings = { fileinfo } },
+							{ hl = "MiniStatuslineLocation", strings = { location } },
+						})
+					end,
+				},
+			})
 			-- Custom highlights for each mode (transparent backgrounds)
 			vim.api.nvim_set_hl(0, "MiniStatuslineModeNormal", { fg = "#ccc9c0", bg = "NONE", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = "#1e1e1e", bg = "#DED157", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = "#1e1e1e", bg = "#569CD6", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = "#1e1e1e", bg = "#CE9178", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = "#1e1e1e", bg = "#4EC9B0", bold = true })
-			vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = "#1e1e1e", bg = "#75beff", bold = true })
+			vim.api.nvim_set_hl(0, "MiniStatuslineModeInsert", { fg = "#2e2e2e", bg = "#DED157", bold = true })
+			vim.api.nvim_set_hl(0, "MiniStatuslineModeVisual", { fg = "#2e2e2e", bg = "#569CD6", bold = true })
+			vim.api.nvim_set_hl(0, "MiniStatuslineModeReplace", { fg = "#2e2e2e", bg = "#CE9178", bold = true })
+			vim.api.nvim_set_hl(0, "MiniStatuslineModeCommand", { fg = "#2e2e2e", bg = "#4EC9B0", bold = true })
+			vim.api.nvim_set_hl(0, "MiniStatuslineModeOther", { fg = "#2e2e2e", bg = "#75beff", bold = true })
 			vim.api.nvim_set_hl(0, "MiniStatuslineInactive", { fg = "#6A9955", bg = "NONE", italic = true })
-
 			-- Optional: tweak other statusline sections for consistency
 			vim.api.nvim_set_hl(0, "MiniStatuslineDevinfo", { fg = "#DED157", bg = "NONE" })
 			vim.api.nvim_set_hl(0, "MiniStatuslineFilename", { fg = "#569CD6", bg = "NONE" })
 			vim.api.nvim_set_hl(0, "MiniStatuslineFileinfo", { fg = "#4EC9B0", bg = "NONE" })
+		end,
+	},
+	{
+		"echasnovski/mini.indentscope",
+		version = "*",
+		config = function()
+			require("mini.indentscope").setup({
+				symbol = "│",
+				draw = {
+					animation = function()
+						return 10
+					end, -- returns the duration in milliseconds
+				},
+			})
 		end,
 	},
 	-- Snacks (zen, etc.)
@@ -1181,6 +1329,8 @@ endfunction
 			end,
 		},
 	},
+	-- git signs
+	{ "lewis6991/gitsigns.nvim" },
 	-- vim fugitive (git related)
 	{
 		"tpope/vim-fugitive",
@@ -1341,11 +1491,11 @@ endfunction
 							new_terminal_ipython,
 							desc = "new [i]python terminal",
 						},
-						{
-							"<leader>cp",
-							new_terminal_python,
-							desc = "new [p]ython terminal",
-						},
+						-- {
+						-- 	"<leader>cp",
+						-- 	new_terminal_python,
+						-- 	desc = "new [p]ython terminal",
+						-- },
 						{ "<leader>cr", new_terminal_r, desc = "new [R] terminal" },
 						{ "<leader>f<space>", "<cmd>Telescope buffers<cr>", desc = "[ ] buffers" },
 						{ "<leader>fc", "<cmd>Telescope git_commits<cr>", desc = "git [c]ommits" },
@@ -1379,7 +1529,18 @@ end
 -- =====================
 -- 3. KEYMAPS & AUTOCMDS
 -- =====================
--- local wk = require("which-key") -- REMOVED: Now managed by lazy.nvim and configured above
+
+-- Function to show current git branch using fidget.nvim
+local function show_git_branch()
+	local branch = vim.fn.systemlist("git branch --show-current")[1] or ""
+	if branch == "" then
+		require("fidget").notify("Not in a git repository", vim.log.levels.INFO, { title = "Git Branch" })
+	else
+		require("fidget").notify("Current branch: " .. branch, vim.log.levels.INFO, { title = "Git Branch" })
+	end
+end
+-- Keymap: <leader>br to show current git branch
+vim.keymap.set("n", "<leader>br", show_git_branch, { desc = "Show current git branch" })
 
 -- Helper functions for basic keymaps (if not used by which-key, can stay here)
 local nmap = function(key, effect)

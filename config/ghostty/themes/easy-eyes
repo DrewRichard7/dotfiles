@@ -20,7 +20,7 @@ palette = 13=#d670d6
 palette = 14=#29b8db
 palette = 15=#e5e5e5
 # Basic colors
-background = #2e2e2e
+background = #191a19
 foreground = #ccc9c0
 # Cursor
 cursor-color = #fffae9
@@ -30,7 +30,7 @@ selection-background = #ccccfb
 selection-foreground = #fffae9
 
 # # Core Colors
-# background = #2e2e2e
+# background = #191a19
 # foreground = #ccc9c0
 #
 # # Cursor Colors

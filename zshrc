@@ -157,7 +157,8 @@ qn() { (cd ~/areas/Obsidian && nv quicknote.md); }
 cheat() { (cd ~ && nv .cheatsheet.md); }
 pydict() { (cd ~ && nv .pydict.md); }
 colordict() { (cd ~/resources && nv colordict.md); }
-myvimrc() { (cd ~/.config/fileconfig-nvim/ && nv init.lua); }
+nvimrc() { (cd ~/.config/nvim/ && nv init.lua); }
+myvimrc() { (cd ~/.dotfiles/ && nv vimrc); }
 myghosttyrc() { (cd ~/.config/ghostty && nv config); }
 myweztermrc() { (cd ~/.config/wezterm/ && nv wezterm.lua); }
 myzshrc() { (cd ~ && nv .zshrc); }

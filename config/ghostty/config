@@ -1,6 +1,6 @@
 confirm-close-surface=false
-background-opacity = 0.80
-background-blur-radius = 20
+# background-opacity = 0.80
+# background-blur-radius = 20
 # themes i like, uncomment to activate
 # theme = Wez
 # theme = catppuccin-macchiato
