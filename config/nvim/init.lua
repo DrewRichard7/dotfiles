@@ -383,6 +383,7 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>fb", builtin.buffers, { desc = "[F]ind existing [B]uffers" })
 			vim.keymap.set("n", "<leader>f.", builtin.oldfiles, { desc = '[F]ind Recent Files ("." for repeat)' })
 			vim.keymap.set("n", "<leader>n", ":Telescope fidget<CR>", { desc = "Notification History" })
+			vim.keymap.set("n", "<leader>td", ":Telescope diagnostics<CR>", { desc = "diagnostics" })
 
 			vim.keymap.set("n", "<leader>/", function()
 				builtin.current_buffer_fuzzy_find(
@@ -532,7 +533,13 @@ require("lazy").setup({
 			require("lspconfig").pyright.setup(get_lsp_opts())
 			require("lspconfig").ruff.setup(get_lsp_opts({
 				init_options = { settings = { lineLength = 80 } },
-				-- No need to disable formatting, conform will handle it
+				-- This is the key change:
+				-- We explicitly tell the ruff LSP server NOT to provide formatting.
+				-- This makes conform.nvim the sole authority for formatting Python files.
+				on_attach = function(client, bufnr)
+					client.server_capabilities.documentFormattingProvider = false
+					client.server_capabilities.documentRangeFormattingProvider = false
+				end,
 			}))
 			require("lspconfig").r_language_server.setup(get_lsp_opts({
 				settings = {
@@ -1445,6 +1452,26 @@ endfunction
 			{ "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" },
 		},
 	},
+	{
+		"folke/flash.nvim",
+		event = "VeryLazy",
+		opts = {},
+  -- stylua: ignore
+  keys = {
+    { "zk",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
+    { "Zk",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
+    { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
+    { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+    { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+  },
+	},
+	{
+		"sphamba/smear-cursor.nvim",
+		enabled = true,
+		opts = {
+			legacy_computing_symbols_support = true,
+		},
+	},
 	-- WhichKey
 	{
 		"folke/which-key.nvim",
@@ -1540,7 +1567,7 @@ local function show_git_branch()
 	end
 end
 -- Keymap: <leader>br to show current git branch
-vim.keymap.set("n", "<leader>br", show_git_branch, { desc = "Show current git branch" })
+vim.keymap.set("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Show git branches" })
 
 -- Helper functions for basic keymaps (if not used by which-key, can stay here)
 local nmap = function(key, effect)
@@ -1588,7 +1615,6 @@ vim.keymap.set("n", "<C-S-k>", "<C-w><C-k>")
 vim.keymap.set("i", "<m-m>", "|>", { desc = "insert pipe operator" })
 vim.keymap.set("v", ">", ">gv")
 vim.keymap.set("v", "<", "<gv")
-vim.keymap.set({ "n", "i" }, "<C-s>", "<ESC>:update<CR><esc>", { desc = "save with ctrl-s" })
 vim.keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })
 vim.keymap.set("n", "<leader>sh", "<C-w>s", { desc = "Split window horizontally" })
 vim.keymap.set("n", "<leader>se", "<C-w>=", { desc = "Make splits equal size" })
