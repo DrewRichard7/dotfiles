@@ -468,52 +468,30 @@ require("lazy").setup({
 				local base_opts = { capabilities = capabilities, flags = lsp_flags }
 				return vim.tbl_deep_extend("force", {}, base_opts, server_specific_opts or {})
 			end
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
-					-- A helper function to simplify setting keymaps.
 					local map = function(keys, func, desc, mode)
 						mode = mode or "n"
 						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 					end
 
-					--
-					-- Go-to Commands
-					--
-					-- Jumps to the definition of the word under your cursor.
 					map("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
-
-					-- Jumps to the implementation of the word under yourcursor.
-					-- This is the mapping you requested.
 					map("gi", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
-
-					-- Jumps to the type definition of the word under your cursor.
 					map("gy", vim.lsp.buf.type_definition, "[G]oto [T]ype Definition")
-
-					-- Finds references for the word under your cursor in a Telescope list.
 					map("gr", require("telescope.builtin").lsp_references, "[G]oto [R]eferences")
-
-					--
-					-- Action Commands
-					--
-					-- Renames the variable under your cursor across files.
 					map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
-
-					-- Executes a code action, like refactoring or fixing a diagnostic.
 					map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
-
-					--
-					-- Informational Commands
-					--
-					-- Shows hover documentation for the word under your cursor.
 					map("K", vim.lsp.buf.hover, "Hover Documentation")
-
-					-- Shows signature help for the function call you are in.
 					map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 				end,
 			})
-			-- LSP server setups
-			require("lspconfig").lua_ls.setup(get_lsp_opts({
+
+			-- LSP server setups using the new API
+			local lspconfig = require("lspconfig")
+
+			lspconfig.lua_ls.setup(get_lsp_opts({
 				settings = {
 					Lua = {
 						completion = { callSnippet = "Replace" },
@@ -530,18 +508,18 @@ require("lazy").setup({
 					},
 				},
 			}))
-			require("lspconfig").pyright.setup(get_lsp_opts())
-			require("lspconfig").ruff.setup(get_lsp_opts({
+
+			lspconfig.pyright.setup(get_lsp_opts())
+
+			lspconfig.ruff.setup(get_lsp_opts({
 				init_options = { settings = { lineLength = 80 } },
-				-- This is the key change:
-				-- We explicitly tell the ruff LSP server NOT to provide formatting.
-				-- This makes conform.nvim the sole authority for formatting Python files.
 				on_attach = function(client, bufnr)
 					client.server_capabilities.documentFormattingProvider = false
 					client.server_capabilities.documentRangeFormattingProvider = false
 				end,
 			}))
-			require("lspconfig").r_language_server.setup(get_lsp_opts({
+
+			lspconfig.r_language_server.setup(get_lsp_opts({
 				settings = {
 					r = {
 						lsp = {
@@ -552,15 +530,17 @@ require("lazy").setup({
 					},
 				},
 			}))
-			require("lspconfig").rust_analyzer.setup(get_lsp_opts({
+
+			lspconfig.rust_analyzer.setup(get_lsp_opts({
 				settings = { ["rust-analyzer"] = { diagnostics = { enable = true } } },
 			}))
-			require("lspconfig").html.setup(get_lsp_opts())
-			require("lspconfig").yamlls.setup(get_lsp_opts({
+
+			lspconfig.html.setup(get_lsp_opts())
+			lspconfig.yamlls.setup(get_lsp_opts({
 				settings = { yaml = { schemaStore = { enable = true, url = "" } } },
 			}))
-			require("lspconfig").jsonls.setup(get_lsp_opts())
-			require("lspconfig").taplo.setup(get_lsp_opts())
+			lspconfig.jsonls.setup(get_lsp_opts())
+			lspconfig.taplo.setup(get_lsp_opts())
 
 			-- Formatting: stevearc/conform.nvim
 			require("conform").setup({
@@ -571,9 +551,7 @@ require("lazy").setup({
 					yaml = { "prettier" },
 					html = { "prettier" },
 					toml = { "taplo" },
-					-- Add more as needed
 				},
-				-- Optionally, configure formatters here
 				formatters = {
 					ruff_format = {},
 					stylua = {},
@@ -582,7 +560,7 @@ require("lazy").setup({
 					taplo = {},
 				},
 			})
-			-- format on save
+
 			vim.api.nvim_create_autocmd("BufWritePre", {
 				pattern = "*",
 				callback = function(args)
@@ -593,7 +571,7 @@ require("lazy").setup({
 					})
 				end,
 			})
-			-- Keymap: format on demand
+
 			vim.keymap.set({ "n", "v" }, "<leader>lf", function()
 				require("conform").format({
 					lsp_fallback = true,
@@ -611,6 +589,7 @@ require("lazy").setup({
 					},
 				},
 			})
+
 			require("mason-lspconfig").setup({
 				automatic_installation = true,
 				automatic_enable = true,
@@ -626,6 +605,7 @@ require("lazy").setup({
 					"taplo",
 				},
 			})
+
 			require("mason-tool-installer").setup({
 				ensure_installed = {
 					"ruff",
