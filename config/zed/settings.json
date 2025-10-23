@@ -16,7 +16,7 @@
   "tab_bar": {
     "show": true
   },
-  "theme": "Tokyo Night",
+  "theme": "Gruvbox Dark",
   "icon_theme": "Catppuccin Mocha",
   "edit_predictions": {
     "mode": "subtle",
@@ -30,9 +30,10 @@
     "directories": [".venv", "venv"]
   },
   "agent": {
+    "default_profile": "write",
     "default_model": {
       "provider": "zed.dev",
-      "model": "claude-3-5-sonnet-latest"
+      "model": "claude-sonnet-4"
     },
     "version": "2"
   },
@@ -60,6 +61,7 @@
   "cursor_blink": false,
   "context_servers": {
     "postgres-context-server": {
+      "source": "extension",
       "settings": {
         "database_url": "postgresql://postgres:postgres@localhost:5432/lahman-baseball"
       }

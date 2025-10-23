@@ -464,14 +464,11 @@ require("lazy").setup({
 			end
 
 			local lsp_flags = { allow_incremental_sync = true, debounce_text_changes = 150 }
+			local function get_lsp_opts(server_specific_opts)
+				local base_opts = { capabilities = capabilities, flags = lsp_flags }
+				return vim.tbl_deep_extend("force", {}, base_opts, server_specific_opts or {})
+			end
 
-			-- Global configuration for all servers
-			vim.lsp.config("*", {
-				capabilities = capabilities,
-				flags = lsp_flags,
-			})
-
-			-- LspAttach autocmd (same as before)
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
@@ -491,8 +488,10 @@ require("lazy").setup({
 				end,
 			})
 
-			-- Configure individual servers using vim.lsp.config()
-			vim.lsp.config("lua_ls", {
+			-- LSP server setups using the new API
+			local lspconfig = require("lspconfig")
+
+			lspconfig.lua_ls.setup(get_lsp_opts({
 				settings = {
 					Lua = {
 						completion = { callSnippet = "Replace" },
@@ -508,19 +507,19 @@ require("lazy").setup({
 						telemetry = { enable = false },
 					},
 				},
-			})
+			}))
 
-			vim.lsp.config("pyright", {})
+			lspconfig.pyright.setup(get_lsp_opts())
 
-			vim.lsp.config("ruff", {
+			lspconfig.ruff.setup(get_lsp_opts({
 				init_options = { settings = { lineLength = 80 } },
 				on_attach = function(client, bufnr)
 					client.server_capabilities.documentFormattingProvider = false
 					client.server_capabilities.documentRangeFormattingProvider = false
 				end,
-			})
+			}))
 
-			vim.lsp.config("r_language_server", {
+			lspconfig.r_language_server.setup(get_lsp_opts({
 				settings = {
 					r = {
 						lsp = {
@@ -530,29 +529,18 @@ require("lazy").setup({
 						},
 					},
 				},
-			})
+			}))
 
-			vim.lsp.config("rust_analyzer", {
+			lspconfig.rust_analyzer.setup(get_lsp_opts({
 				settings = { ["rust-analyzer"] = { diagnostics = { enable = true } } },
-			})
+			}))
 
-			vim.lsp.config("html", {})
-			vim.lsp.config("yamlls", {
+			lspconfig.html.setup(get_lsp_opts())
+			lspconfig.yamlls.setup(get_lsp_opts({
 				settings = { yaml = { schemaStore = { enable = true, url = "" } } },
-			})
-			vim.lsp.config("jsonls", {})
-			vim.lsp.config("taplo", {})
-
-			-- Enable all configured servers
-			vim.lsp.enable("lua_ls")
-			vim.lsp.enable("pyright")
-			vim.lsp.enable("ruff")
-			vim.lsp.enable("r_language_server")
-			vim.lsp.enable("rust_analyzer")
-			vim.lsp.enable("html")
-			vim.lsp.enable("yamlls")
-			vim.lsp.enable("jsonls")
-			vim.lsp.enable("taplo")
+			}))
+			lspconfig.jsonls.setup(get_lsp_opts())
+			lspconfig.taplo.setup(get_lsp_opts())
 
 			-- Formatting: stevearc/conform.nvim
 			require("conform").setup({
@@ -604,7 +592,7 @@ require("lazy").setup({
 
 			require("mason-lspconfig").setup({
 				automatic_installation = true,
-				automatic_enable = false, -- We're handling enable with vim.lsp.enable()
+				automatic_enable = true,
 				ensure_installed = {
 					"lua_ls",
 					"pyright",

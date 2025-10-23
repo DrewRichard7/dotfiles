@@ -6,11 +6,15 @@ confirm-close-surface=false
 # theme = catppuccin-macchiato
 # theme = catppuccin-mocha
 # theme = tokyonight
+# theme = Everforest Dark - Hard
 # theme = Aurora
 # theme = Builtin Pastel Dark
 # theme = Cobalt Neon
 # theme = rose-pine-moon
-theme = "easy-eyes"
+# theme = Rose Pine
+# theme = "easy-eyes"
+theme = Kanagawa Wave
+# theme = Kanagawa Dragon
 # cursor features
 shell-integration-features = no-cursor
 cursor-color = 97E5F5

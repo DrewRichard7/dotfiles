@@ -16,23 +16,24 @@
   "tab_bar": {
     "show": true
   },
-  "theme": "Tokyo Night",
-  "icon_theme": "Material Icon Theme",
+  "theme": "Gruvbox Dark",
+  "icon_theme": "Catppuccin Mocha",
   "edit_predictions": {
     "mode": "subtle",
     "copilot": {
       "proxy": null,
       "proxy_no_verify": null
     },
-    "enabled_in_assistant": false
+    "enabled_in_text_threads": false
   },
   "detect_venv": {
     "directories": [".venv", "venv"]
   },
-  "assistant": {
+  "agent": {
+    "default_profile": "write",
     "default_model": {
       "provider": "zed.dev",
-      "model": "claude-3-5-sonnet-latest"
+      "model": "claude-sonnet-4"
     },
     "version": "2"
   },
@@ -52,11 +53,7 @@
   "ui_font_size": 16,
   "buffer_font_size": 16,
   "buffer_font_family": "Monaspace Neon",
-  "buffer_font_fallbacks": [
-    "MesloLGS Nerd Font",
-    "SF Mono",
-    "Hack Nerd Font Mono"
-  ],
+  "buffer_font_fallbacks": ["MesloLGS Nerd Font", "SF Mono", "Hack Nerd Font Mono"],
   "centered_layout": {
     "left_padding": 0.2,
     "right_padding": 0.2
@@ -80,9 +77,8 @@
     "Python": {
       "language_servers": [
         "ruff",
-        "pyright",
-        "python-refactoring",
-        "basedpyright"
+        "pyright"
+        // "python-refactoring",
       ],
       "format_on_save": "on",
       "formatter": [
@@ -101,6 +97,24 @@
     }
   },
   "lsp": {
+    "basedpyright": {
+      "binary": {
+        "path": ".venv/bin/basedpyright-langserver",
+        "arguments": ["--stdio"]
+      },
+      "settings": {
+        "python": {
+          "pythonPath": ".venv/bin/python"
+        },
+        "basedpyright.analysis": {
+          "diagnosticMode": "workspace",
+          "reportMissingTypeStubs": false, // This will turn off the warning
+          "inlayHints": {
+            "callArgumentNames": false
+          }
+        }
+      }
+    },
     "ruff": {
       "initialization_options": {
         "settings": {
