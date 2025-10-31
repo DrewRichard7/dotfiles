@@ -26,14 +26,6 @@ vim.opt.clipboard:append("unnamedplus")
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
--- needed for zen mode (theprimeagen)
-function ColorMyPencils(color)
-	color = color or "bamboo"
-	vim.cmd.colorscheme(color)
-
-	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-end
 -- =====================
 -- 2. PLUGIN MANAGER: lazy.nvim
 -- =====================
@@ -66,21 +58,6 @@ require("lazy").setup({
 			require("bamboo").load()
 		end,
 	},
-	{
-		"rose-pine/neovim",
-		enabled = false,
-		name = "rose-pine",
-		config = function()
-			require("rose-pine").setup({
-				disable_background = true,
-				styles = {
-					italic = false,
-				},
-			})
-
-			ColorMyPencils()
-		end,
-	},
 	-- Colorscheme: Kanagawa
 	{
 		"rebelot/kanagawa.nvim",
@@ -111,7 +88,11 @@ require("lazy").setup({
 		end,
 	},
 	-- Colorizer
-	{ "NvChad/nvim-colorizer.lua", opts = { filetypes = { "*" }, user_default_options = { mode = "background" } } },
+	{
+		"NvChad/nvim-colorizer.lua",
+		event = "BufReadPost",
+		opts = { filetypes = { "*" }, user_default_options = { mode = "background" } },
+	},
 	-- notification handler
 	{
 		"j-hui/fidget.nvim",
@@ -260,8 +241,8 @@ require("lazy").setup({
 					"r",
 					"rust",
 				},
-				sync_install = true,
-				auto_install = true,
+				sync_install = false,
+				auto_install = false,
 				highlight = {
 					enable = true,
 					disable = function(lang, buf)
@@ -292,7 +273,6 @@ require("lazy").setup({
 			{ "stevearc/conform.nvim" },
 		},
 		config = function()
-			-- Capabilities
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
 			local blink_ok, blink = pcall(require, "blink.cmp")
 			if blink_ok then
@@ -316,7 +296,6 @@ require("lazy").setup({
 				end,
 			})
 
-			-- Diagnostics UI
 			vim.diagnostic.config({
 				virtual_text = true,
 				signs = true,
@@ -328,12 +307,11 @@ require("lazy").setup({
 			vim.lsp.handlers.hover = { border = "rounded", max_width = 80 }
 			vim.lsp.handlers.signature_help = { border = "rounded", max_width = 80 }
 
-			-- Base config function
 			local function get_opts(server_opts)
 				return vim.tbl_deep_extend("force", { capabilities = capabilities }, server_opts or {})
 			end
 
-			-- Configure servers
+			-- Configure only YOUR servers
 			vim.lsp.config(
 				"lua_ls",
 				get_opts({
@@ -354,46 +332,17 @@ require("lazy").setup({
 			)
 
 			vim.lsp.config("pyright", get_opts())
-
-			vim.lsp.config(
-				"ruff",
-				get_opts({
-					init_options = { settings = { lineLength = 80 } },
-				})
-			)
-
+			vim.lsp.config("ruff", get_opts({ init_options = { settings = { lineLength = 80 } } }))
 			vim.lsp.config(
 				"rust_analyzer",
-				get_opts({
-					settings = { ["rust-analyzer"] = { diagnostics = { enable = true } } },
-				})
+				get_opts({ settings = { ["rust-analyzer"] = { diagnostics = { enable = true } } } })
 			)
-
 			vim.lsp.config("html", get_opts())
-
-			vim.lsp.config(
-				"yamlls",
-				get_opts({
-					settings = { yaml = { schemaStore = { enable = true, url = "" } } },
-				})
-			)
-
+			vim.lsp.config("yamlls", get_opts({ settings = { yaml = { schemaStore = { enable = true, url = "" } } } }))
 			vim.lsp.config("jsonls", get_opts())
 			vim.lsp.config("taplo", get_opts())
 
-			-- Enable all configured servers
-			vim.lsp.enable({
-				"lua_ls",
-				"pyright",
-				"ruff",
-				"rust_analyzer",
-				"html",
-				"yamlls",
-				"jsonls",
-				"taplo",
-			})
-
-			-- Mason
+			-- Mason setup
 			require("mason").setup({
 				ui = {
 					icons = {
@@ -404,8 +353,17 @@ require("lazy").setup({
 				},
 			})
 
+			-- Only install the servers YOU want
 			require("mason-lspconfig").setup({
 				ensure_installed = { "lua_ls", "pyright", "ruff", "rust_analyzer", "html", "yamlls", "jsonls", "taplo" },
+				handlers = {
+					-- Auto-setup servers from ensure_installed
+					function(server_name)
+						if vim.lsp.get_config(server_name) then
+							vim.lsp.start_client(vim.lsp.config(server_name))
+						end
+					end,
+				},
 			})
 
 			require("mason-tool-installer").setup({
@@ -413,7 +371,6 @@ require("lazy").setup({
 				auto_update = true,
 			})
 
-			-- Conform formatting
 			require("conform").setup({
 				formatters_by_ft = {
 					python = { "ruff_format" },
@@ -449,62 +406,25 @@ require("lazy").setup({
 			})
 		end,
 	},
-	{
-		"MeanderingProgrammer/render-markdown.nvim",
-		enabled = true,
-		ft = { "md", "markdown", "qmd", "quarto", "copilot-chat" },
-		-- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
-		dependencies = { "nvim-treesitter/nvim-treesitter", "nvim-tree/nvim-web-devicons" }, -- if you prefer nvim-web-devicons
-		---@module 'render-markdown'
-		---@type render.md.UserConfig
-		config = function()
-			require("render-markdown").setup({
-				file_types = { "markdown", "quarto", "copilot-chat" },
-				completions = { -- Settings for blink.cmp completions source
-					blink = { enabled = true }, -- Settings for coq_nvim completions source
-					coq = { enabled = false }, -- Settings for in-process language server completions
-					lsp = { enabled = false },
-					filter = {
-						callout = function() -- example to exclude obsidian callouts
-							return value.category ~= "obsidian" -- return true
-						end,
-						checkbox = function()
-							return true
-						end,
-					},
-				},
-				heading = {
-					enable = true,
-					levels = { 1, 2, 3, 4, 5, 6 },
-					icons = { "󰊠󰁕 ", "󰊠󰶻 ", "󰊠󰐃 ", "󰐃 ", "󰗉 ", "󰶼 " },
-					conceal = true,
-				},
-				checkbox = {
-					enabled = false,
-				},
-			})
-		end,
-	},
 	-- GitHub Copilot
 	{
 		"CopilotC-Nvim/CopilotChat.nvim",
 		dependencies = {
 			{ "zbirenbaum/copilot.lua" },
-			{ "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
+			{ "nvim-lua/plenary.nvim", branch = "master" },
 		},
-		opts = {
-			-- See Configuration section for options
-		},
-		vim.keymap.set("n", "<leader>cp", ":CopilotChatToggle<CR>", { desc = "Toggle Copilot Chat" }),
-		-- Quick chat keybinding
-		vim.keymap.set("n", "<leader>cq", function()
-			local input = vim.fn.input("Quick Chat: ")
-			if input ~= "" then
-				require("CopilotChat").ask(input, {
-					selection = require("CopilotChat.selection").buffer,
-				})
-			end
-		end, { desc = "CopilotChat - Quick chat" }),
+		opts = {},
+		config = function()
+			vim.keymap.set("n", "<leader>cp", ":CopilotChatToggle<CR>", { desc = "Toggle Copilot Chat" })
+			vim.keymap.set("n", "<leader>cq", function()
+				local input = vim.fn.input("Quick Chat: ")
+				if input ~= "" then
+					require("CopilotChat").ask(input, {
+						selection = require("CopilotChat.selection").buffer,
+					})
+				end
+			end, { desc = "CopilotChat - Quick chat" })
+		end,
 	},
 	{
 		"zbirenbaum/copilot.lua",
@@ -543,16 +463,13 @@ require("lazy").setup({
 	{
 		"saghen/blink.cmp",
 		enabled = true,
-		-- optional: provides snippets for the snippet source
 		dependencies = {
 			"rafamadriz/friendly-snippets",
 			"giuxtaposition/blink-cmp-copilot",
 			"zbirenbaum/copilot.lua",
 		},
-		build = "cargo build --release",
-
+		build = vim.fn.has("mac") == 1 and "" or "cargo build --release",
 		version = "*",
-
 		opts = {
 			sources = {
 				default = { "lsp", "path", "snippets", "buffer", "copilot" },
@@ -574,36 +491,29 @@ require("lazy").setup({
 					},
 				},
 			},
-			-- See :h blink-cmp-config-keymap for defining your own keymap
 			keymap = { preset = "default" },
-
 			appearance = {
 				use_nvim_cmp_as_default = true,
 				nerd_font_variant = "mono",
 				kind_icons = {
-					Copilot = "",
+					Copilot = "",
 					Text = "󰉿",
 					Method = "󰊕",
 					Function = "󰊕",
 					Constructor = "󰒓",
-
 					Field = "󰜢",
 					Variable = "󰆦",
 					Property = "󰖷",
-
 					Class = "󱡠",
 					Interface = "󱡠",
 					Struct = "󱡠",
 					Module = "󰅩",
-
 					Unit = "󰪚",
 					Value = "󰦨",
 					Enum = "󰦨",
 					EnumMember = "󰦨",
-
 					Keyword = "󰻾",
 					Constant = "󰏿",
-
 					Snippet = "󱄽",
 					Color = "󰏘",
 					File = "󰈔",
@@ -614,40 +524,33 @@ require("lazy").setup({
 					TypeParameter = "󰬛",
 				},
 			},
-
 			signature = { enabled = true },
-
 			fuzzy = { implementation = "prefer_rust_with_warning" },
 		},
 		config = function()
-			-- NOTE: add opts inside setup() if probs
 			require("blink.cmp").setup()
 		end,
 	},
 	-- TODO: comments
 	{
-		-- TODO: comments
-
 		"folke/todo-comments.nvim",
 		enabled = true,
 		event = "VimEnter",
 		dependencies = { "nvim-lua/plenary.nvim" },
 		opts = { signs = false },
-		vim.keymap.set("n", "]t", function()
-			require("todo-comments").jump_next()
-		end, { desc = "Next todo comment" }),
-
-		vim.keymap.set("n", "[t", function()
-			require("todo-comments").jump_prev()
-		end, { desc = "Previous todo comment" }),
-
-		vim.keymap.set("n", "<leader>ft", ":TodoTelescope<CR>", { desc = "Find todo comments" }),
-
-		-- You can also specify a list of valid jump keywords
-
-		vim.keymap.set("n", "<leader>]t", function()
-			require("todo-comments").jump_next({ keywords = { "ERROR", "WARNING" } })
-		end, { desc = "Next error/warning todo comment" }),
+		config = function()
+			require("todo-comments").setup()
+			vim.keymap.set("n", "]t", function()
+				require("todo-comments").jump_next()
+			end, { desc = "Next todo comment" })
+			vim.keymap.set("n", "[t", function()
+				require("todo-comments").jump_prev()
+			end, { desc = "Previous todo comment" })
+			vim.keymap.set("n", "<leader>ft", ":TodoTelescope<CR>", { desc = "Find todo comments" })
+			vim.keymap.set("n", "<leader>]t", function()
+				require("todo-comments").jump_next({ keywords = { "ERROR", "WARNING" } })
+			end, { desc = "Next error/warning todo comment" })
+		end,
 	},
 	-- NVIM surround (more similar to vim-surround)
 	{
@@ -710,7 +613,7 @@ require("lazy").setup({
 				symbol = "│",
 				draw = {
 					animation = function()
-						return 10
+						return 0 -- 10 for animation
 					end, -- returns the duration in milliseconds
 				},
 			})
@@ -720,7 +623,7 @@ require("lazy").setup({
 	{
 		"folke/snacks.nvim",
 		enabled = true,
-		priority = 999,
+		priority = 1000,
 		lazy = false,
 		opts = {
 			bigfile = { enabled = true },
@@ -768,6 +671,10 @@ require("lazy").setup({
 			vim.keymap.set("n", "<C-S-N>", function()
 				harpoon:list():next()
 			end)
+			vim.keymap.set("n", "<C-e>", function()
+				require("harpoon").ui:toggle_quick_menu(require("harpoon"):list())
+			end, { desc = "Toggle harpoon menu" })
+
 			local conf_ok, conf = pcall(require, "telescope.config")
 			if not conf_ok then
 				return
@@ -790,9 +697,6 @@ require("lazy").setup({
 				toggle_telescope(harpoon:list())
 			end, { desc = "Open harpoon window" })
 		end,
-		vim.keymap.set("n", "<C-e>", function()
-			require("harpoon").ui:toggle_quick_menu(require("harpoon"):list())
-		end),
 	},
 	-- Trouble (diagnostics, quickfix)
 	{
@@ -824,35 +728,31 @@ require("lazy").setup({
 			require("cloak").setup({
 				enabled = true,
 				cloak_character = "*",
-				-- The applied highlight group (colors) on the cloaking, see `:h highlight`.
 				highlight_group = "Comment",
 				patterns = {
 					{
-						-- Match any file starting with ".env".
-						-- This can be a table to match multiple file patterns.
-						file_pattern = {
-							".env*",
-							"wrangler.toml",
-							".dev.vars",
-						},
-						-- Match an equals sign and any character after it.
-						-- This can also be a table of patterns to cloak,
-						-- example: cloak_pattern = { ":.+", "-.+" } for yaml files.
+						file_pattern = { ".env*", "wrangler.toml", ".dev.vars" },
 						cloak_pattern = "=.+",
 					},
 				},
 			})
+			vim.keymap.set("n", "<leader>cl", ":CloakToggle<CR>", { desc = "Toggle Cloak.nvim" })
 		end,
-		vim.keymap.set("n", "<leader>cl", ":CloackToggle<CR>", { desc = "Toggle Cloak.nvim" }),
 	},
 	-- git signs
-	{ "lewis6991/gitsigns.nvim" },
+	{
+		"lewis6991/gitsigns.nvim",
+		event = "BufReadPost",
+		opts = {},
+	},
 	{
 		"christoomey/vim-tmux-navigator",
-		vim.keymap.set("n", "<C-S-h>", ":TmuxNavigateLeft<CR>"),
-		vim.keymap.set("n", "<C-S-j>", ":TmuxNavigateDown<CR>"),
-		vim.keymap.set("n", "<C-S-k>", ":TmuxNavigateUp<CR>"),
-		vim.keymap.set("n", "<C-S-l>", ":TmuxNavigateRight<CR>"),
+		config = function()
+			vim.keymap.set("n", "<C-S-h>", ":TmuxNavigateLeft<CR>")
+			vim.keymap.set("n", "<C-S-j>", ":TmuxNavigateDown<CR>")
+			vim.keymap.set("n", "<C-S-k>", ":TmuxNavigateUp<CR>")
+			vim.keymap.set("n", "<C-S-l>", ":TmuxNavigateRight<CR>")
+		end,
 	},
 	{
 		"kdheepak/lazygit.nvim",
@@ -877,20 +777,17 @@ require("lazy").setup({
 	},
 	{
 		"folke/flash.nvim",
+		enabled = false,
 		event = "VeryLazy",
 		opts = {},
   -- stylua: ignore
   keys = {
-    { "zk",     mode = { "n", "x", "o" }, function() require("flash").jump() end,              desc = "Flash" },
-    { "Zk",     mode = { "n", "x", "o" }, function() require("flash").treesitter() end,        desc = "Flash Treesitter" },
-    { "r",     mode = "o",               function() require("flash").remote() end,            desc = "Remote Flash" },
-    { "R",     mode = { "o", "x" },      function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
-    { "<c-s>", mode = { "c" },           function() require("flash").toggle() end,            desc = "Toggle Flash Search" },
+    { "zk",mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
   },
 	},
 	{
 		"sphamba/smear-cursor.nvim",
-		enabled = true,
+		enabled = false,
 		opts = {
 			legacy_computing_symbols_support = true,
 		},
@@ -926,10 +823,6 @@ require("lazy").setup({
 		end,
 	},
 })
--- for my custom colortheme:
-if use_mytheme then
-	apply_mytheme()
-end
 -- restore it
 -- =====================
 -- 3. KEYMAPS & AUTOCMDS
@@ -937,7 +830,6 @@ end
 
 -- Keymap: <leader>br to show current git branch
 vim.keymap.set("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Show git branches" })
-
 -- Helper functions for basic keymaps (if not used by which-key, can stay here)
 local nmap = function(key, effect)
 	vim.keymap.set("n", key, effect, { silent = true, noremap = true })
@@ -945,15 +837,12 @@ end
 
 -- Basic keymaps (not managed by which-key)
 vim.keymap.set("i", "jk", "<ESC>", { desc = "exit insert mode with jk" })
+vim.keymap.set("i", "<ESC>", "<ESC>", { desc = "exit insert mode with esc" })
+
 nmap("<C-d>", "<C-d>zz")
 nmap("<C-u>", "<C-u>zz")
 nmap("j", "jzz") -- Consider if these jzz/kzz are desired globally
 nmap("k", "kzz")
-
-vim.keymap.set("n", "<C-S-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
-vim.keymap.set("n", "<C-S-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
-vim.keymap.set("n", "<C-S-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-vim.keymap.set("n", "<C-S-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -973,7 +862,7 @@ vim.keymap.set(
 	":lua vim.api.nvim_command('lua ' .. table.concat(vim.api.nvim_buf_get_lines(0, vim.fn.line(\"'<\") - 1, vim.fn.line(\"'>\"), false), '\\n'))<CR>",
 	{ desc = "execute current selection as Lua" }
 ) -- More robust visual selection execution
-vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
+-- vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("i", "<m-m>", "|>", { desc = "insert pipe operator" })
 vim.keymap.set("v", ">", ">gv")
 vim.keymap.set("v", "<", "<gv")
@@ -1042,7 +931,6 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.opt_local.shiftwidth = 2
 		vim.opt_local.tabstop = 2
 		vim.opt_local.expandtab = true
-		vim.notify("ft_settings applied", vim.log.levels.INFO)
 	end,
 })
 
