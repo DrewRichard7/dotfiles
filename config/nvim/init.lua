@@ -7,7 +7,6 @@
 -- =====================
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
-vim.g.slime_cell_delimiter = "```"
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
@@ -27,197 +26,13 @@ vim.opt.clipboard:append("unnamedplus")
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
--- Floating window border colors
-vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#00DD96", bg = "NONE" })
-vim.api.nvim_set_hl(0, "TelescopeBorder", { fg = "#00DD96", bg = "NONE" })
-
-local general_augroup = vim.api.nvim_create_augroup("MyGeneralSetupAu", { clear = true })
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
-	group = general_augroup,
-	pattern = "*.ipynb",
-	command = "setlocal filetype=quarto",
-	desc = "Treat .ipynb as quarto files",
-})
-
-vim.api.nvim_create_augroup("DapGroup", { clear = true })
-
-local function navigate(args)
-	local buffer = args.buf
-
-	local wid = nil
-	local win_ids = vim.api.nvim_list_wins() -- Get all window IDs
-	for _, win_id in ipairs(win_ids) do
-		local win_bufnr = vim.api.nvim_win_get_buf(win_id)
-		if win_bufnr == buffer then
-			wid = win_id
-		end
-	end
-
-	if wid == nil then
-		return
-	end
-
-	vim.schedule(function()
-		if vim.api.nvim_win_is_valid(wid) then
-			vim.api.nvim_set_current_win(wid)
-		end
-	end)
-end
-
-local function create_nav_options(name)
-	return {
-		group = "DapGroup",
-		pattern = string.format("*%s*", name),
-		callback = navigate,
-	}
-end
-
 -- needed for zen mode (theprimeagen)
 function ColorMyPencils(color)
-	color = color or "kanagawa"
+	color = color or "bamboo"
 	vim.cmd.colorscheme(color)
 
 	vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
 	vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-end
---=========================================================
-------------------- MY CUSTOM COLORTHEME __________________
---=========================================================
-local use_mytheme = true -- set to true to enable
-
-local function apply_mytheme()
-	local colors = {
-		fg = "#ccc9c0",
-		cursor = "#aeafad",
-		comment = "#6A9955",
-		keyword = "#569CD6",
-		string = "#CE9178",
-		number = "#B5CEA8",
-		func = "#DED157",
-		type = "#4EC9B0",
-		variable = "#9CDCFE",
-		constant = "#4FC1FF",
-		operator = "#f200ff",
-		error = "#f47171",
-		warning = "#cca700",
-		info = "#75beff",
-		hint = "#81c164",
-		visual = "#fdef9f",
-		linehl = "#4a442c",
-		search = "#515c6a",
-		matchparen = "#006400",
-	}
-
-	local set = vim.api.nvim_set_hl
-
-	vim.cmd("highlight clear")
-	if vim.fn.exists("syntax_on") then
-		vim.cmd("syntax reset")
-	end
-	vim.o.termguicolors = true
-	vim.g.colors_name = "mytheme"
-
-	-- UI (all bg = "NONE" for transparency)
-	set(0, "Normal", { fg = colors.fg, bg = "NONE" })
-	set(0, "NormalNC", { fg = colors.fg, bg = "NONE" })
-	set(0, "NormalFloat", { fg = colors.fg, bg = "NONE" })
-	set(0, "FloatBorder", { fg = "#00DD96", bg = "NONE" })
-	set(0, "TelescopeBorder", { fg = "#00DD96", bg = "NONE" })
-	set(0, "Cursor", { fg = "NONE", bg = colors.cursor })
-	set(0, "CursorLine", { bg = "NONE" })
-	set(0, "CursorColumn", { bg = "NONE" })
-	set(0, "Visual", { bg = "NONE", underline = true, reverse = true })
-	set(0, "LineNr", { fg = "#a2905e", bg = "NONE" })
-	set(0, "CursorLineNr", { fg = "#79dca5", bg = "NONE" })
-	set(0, "VertSplit", { fg = "#ffe96e", bg = "NONE" })
-	set(0, "StatusLine", { fg = colors.fg, bg = "NONE" })
-	set(0, "StatusLineNC", { fg = "#fffae9", bg = "NONE" })
-	set(0, "Pmenu", { fg = colors.fg, bg = "NONE" })
-	set(0, "PmenuSel", { fg = "#fffae9", bg = "#333333" })
-	set(0, "Search", { bg = colors.search, fg = colors.fg })
-	set(0, "IncSearch", { bg = colors.search, fg = colors.fg })
-	set(0, "MatchParen", { bg = colors.matchparen, underline = true })
-	set(0, "Error", { fg = colors.error, bold = true, bg = "NONE" })
-	set(0, "WarningMsg", { fg = colors.warning, bold = true, bg = "NONE" })
-	set(0, "InfoMsg", { fg = colors.info, bg = "NONE" })
-	set(0, "HintMsg", { fg = colors.hint, bg = "NONE" })
-
-	-- Syntax
-	set(0, "Comment", { fg = colors.comment, italic = true, bg = "NONE" })
-	set(0, "Constant", { fg = colors.constant, bg = "NONE" })
-	set(0, "String", { fg = colors.string, bg = "NONE" })
-	set(0, "Character", { fg = colors.string, bg = "NONE" })
-	set(0, "Number", { fg = colors.number, bg = "NONE" })
-	set(0, "Boolean", { fg = colors.number, bg = "NONE" })
-	set(0, "Identifier", { fg = colors.variable, bg = "NONE" })
-	set(0, "Function", { fg = colors.func, italic = true, bg = "NONE" })
-	set(0, "Statement", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Conditional", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Repeat", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Label", { fg = "#C8C8C8", bg = "NONE" })
-	set(0, "Operator", { fg = colors.operator, bg = "NONE" })
-	set(0, "Keyword", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Exception", { fg = colors.keyword, bg = "NONE" })
-	set(0, "PreProc", { fg = colors.keyword, bg = "NONE" })
-	set(0, "Type", { fg = colors.type, bg = "NONE" })
-	set(0, "StorageClass", { fg = colors.type, bg = "NONE" })
-	set(0, "Structure", { fg = "#3acfa7", bold = true, bg = "NONE" })
-	set(0, "Typedef", { fg = colors.type, bg = "NONE" })
-	set(0, "Special", { fg = "#D7BA7D", bg = "NONE" })
-	set(0, "Underlined", { underline = true, bg = "NONE" })
-	set(0, "Ignore", { fg = "#8c8c8c", bg = "NONE" })
-	set(0, "ErrorMsg", { fg = colors.error, bold = true, bg = "NONE" })
-	set(0, "Todo", { fg = "#fffae9", bg = "#653723", bold = true })
-
-	-- Treesitter (nvim 0.5+)
-	set(0, "@comment", { fg = colors.comment, italic = true, bg = "NONE" })
-	set(0, "@keyword", { fg = colors.keyword, bg = "NONE" })
-	set(0, "@string", { fg = colors.string, bg = "NONE" })
-	set(0, "@number", { fg = colors.number, bg = "NONE" })
-	set(0, "@function", { fg = colors.func, italic = true, bg = "NONE" })
-	set(0, "@type", { fg = colors.type, bg = "NONE" })
-	set(0, "@variable", { fg = colors.variable, bg = "NONE" })
-	set(0, "@constant", { fg = colors.constant, bg = "NONE" })
-	set(0, "@operator", { fg = colors.operator, bg = "NONE" })
-	set(0, "@property", { fg = "#b790ff", italic = true, bg = "NONE" })
-	set(0, "@field", { fg = "#42a3ff", italic = true, bg = "NONE" })
-	set(0, "@parameter", { fg = "#8be4d8", italic = true, bg = "NONE" })
-	set(0, "@enum", { fg = "#3dbbff", bold = true, bg = "NONE" })
-	set(0, "@enumMember", { fg = "#3dbbff", bg = "NONE" })
-	set(0, "@interface", { fg = "#ffea00", bg = "NONE" })
-	set(0, "@namespace", { fg = "#51b7a3", bg = "NONE" })
-	set(0, "@class", { fg = "#00d885", bg = "NONE" })
-	set(0, "@struct", { fg = "#3acfa7", bold = true, bg = "NONE" })
-
-	-- Diagnostics
-	set(0, "DiagnosticError", { fg = colors.error, bg = "NONE" })
-	set(0, "DiagnosticWarn", { fg = colors.warning, bg = "NONE" })
-	set(0, "DiagnosticInfo", { fg = colors.info, bg = "NONE" })
-	set(0, "DiagnosticHint", { fg = colors.hint, bg = "NONE" })
-
-	-- Git
-	set(0, "DiffAdd", { bg = "NONE" })
-	set(0, "DiffChange", { bg = "NONE" })
-	set(0, "DiffDelete", { bg = "NONE" })
-	set(0, "DiffText", { bg = "NONE" })
-
-	-- Terminal colors
-	vim.g.terminal_color_0 = "#000000"
-	vim.g.terminal_color_1 = "#cd3131"
-	vim.g.terminal_color_2 = "#0dbc79"
-	vim.g.terminal_color_3 = "#e5e510"
-	vim.g.terminal_color_4 = "#2472c8"
-	vim.g.terminal_color_5 = "#bc3fbc"
-	vim.g.terminal_color_6 = "#11a8cd"
-	vim.g.terminal_color_7 = "#e5e5e5"
-	vim.g.terminal_color_8 = "#666666"
-	vim.g.terminal_color_9 = "#f14c4c"
-	vim.g.terminal_color_10 = "#23d18b"
-	vim.g.terminal_color_11 = "#f5f543"
-	vim.g.terminal_color_12 = "#3b8eea"
-	vim.g.terminal_color_13 = "#d670d6"
-	vim.g.terminal_color_14 = "#29b8db"
-	vim.g.terminal_color_15 = "#e5e5e5"
 end
 -- =====================
 -- 2. PLUGIN MANAGER: lazy.nvim
@@ -235,6 +50,22 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+	-- Using lazy.nvim
+	{
+		"ribru17/bamboo.nvim",
+		enabled = true,
+		lazy = false,
+		priority = 1000,
+		config = function()
+			require("bamboo").setup({
+				style = "multiplex",
+				lualine = {
+					transparent = true,
+				},
+			})
+			require("bamboo").load()
+		end,
+	},
 	{
 		"rose-pine/neovim",
 		enabled = false,
@@ -250,7 +81,7 @@ require("lazy").setup({
 			ColorMyPencils()
 		end,
 	},
-	-- Colorscheme: Kanagawa (enabled)
+	-- Colorscheme: Kanagawa
 	{
 		"rebelot/kanagawa.nvim",
 		enabled = false,
@@ -282,26 +113,33 @@ require("lazy").setup({
 	-- Colorizer
 	{ "NvChad/nvim-colorizer.lua", opts = { filetypes = { "*" }, user_default_options = { mode = "background" } } },
 	-- notification handler
-	-- Add this to your lazy.nvim plugin list
 	{
 		"j-hui/fidget.nvim",
+		event = "VimEnter",
 		opts = {
 			progress = {
 				display = {
 					render_limit = 1,
-					done_ttl = 1,
+					done_ttl = 2,
 					done_icon = "✔",
 				},
 				ignore = {
-					"lua_ls",
+					["*"] = { "*" },
 				},
 			},
 			notification = {
 				override_vim_notify = true,
+				window = {
+					max_width = 40,
+					max_height = 5,
+				},
 			},
 		},
 		config = function(_, opts)
 			require("fidget").setup(opts)
+			vim.api.nvim_set_hl(0, "FidgetTitle", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "FidgetTask", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "FidgetNotification", { bg = "NONE" })
 		end,
 	},
 	-- Telescope and extensions
@@ -313,7 +151,16 @@ require("lazy").setup({
 			{ "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
 		},
 		config = function()
-			require("telescope").setup({ extensions = { fzf = {} } })
+			require("telescope").setup({
+				defaults = {
+					layout_strategy = "bottom_pane",
+					layout_config = {
+						height = 0.4,
+					},
+					previewer = true,
+				},
+				extensions = { fzf = {} },
+			})
 			require("telescope").load_extension("fzf")
 			require("telescope").load_extension("harpoon")
 			require("telescope").load_extension("fidget")
@@ -386,9 +233,7 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>td", ":Telescope diagnostics<CR>", { desc = "diagnostics" })
 
 			vim.keymap.set("n", "<leader>/", function()
-				builtin.current_buffer_fuzzy_find(
-					require("telescope.themes").get_dropdown({ winblend = 10, previewer = false })
-				)
+				builtin.current_buffer_fuzzy_find(require("telescope.themes").get_ivy({}))
 			end, { desc = "[/] Fuzzily search in current buffer" })
 			vim.keymap.set("n", "<leader>fn", function()
 				builtin.find_files({ cwd = vim.fn.stdpath("config") })
@@ -438,48 +283,29 @@ require("lazy").setup({
 			{
 				"folke/lazydev.nvim",
 				ft = "lua",
-				opts = {
-					library = {
-						{
-							path = "${3rd}/luv/library",
-							words = { "vim%.uv" },
-						},
-					},
-				},
+				opts = { library = { { path = "${3rd}/luv/library", words = { "vim%.uv" } } } },
 			},
-			{ "saghen/blink.cmp" },
+			{ "saghen/blink.cmp", version = "v0.*" },
 			{ "williamboman/mason.nvim" },
 			{ "williamboman/mason-lspconfig.nvim" },
 			{ "WhoIsSethDaniel/mason-tool-installer.nvim" },
 			{ "stevearc/conform.nvim" },
 		},
 		config = function()
-			-- LSP capabilities
+			-- Capabilities
 			local capabilities = vim.lsp.protocol.make_client_capabilities()
-			local blink_cmp_ok, blink_cmp = pcall(require, "blink.cmp")
-			if blink_cmp_ok then
-				capabilities = blink_cmp.get_lsp_capabilities()
-			else
-				vim.notify("blink.cmp not found for LSP capabilities, using default.", vim.log.levels.WARN)
+			local blink_ok, blink = pcall(require, "blink.cmp")
+			if blink_ok then
+				capabilities = blink.get_lsp_capabilities()
 			end
 
-			local lsp_flags = { allow_incremental_sync = true, debounce_text_changes = 150 }
-
-			-- Global configuration for all servers
-			vim.lsp.config("*", {
-				capabilities = capabilities,
-				flags = lsp_flags,
-			})
-
-			-- LspAttach autocmd (same as before)
+			-- LSP keymaps
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
 				callback = function(event)
 					local map = function(keys, func, desc, mode)
-						mode = mode or "n"
-						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+						vim.keymap.set(mode or "n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 					end
-
 					map("gd", vim.lsp.buf.definition, "[G]oto [D]efinition")
 					map("gi", vim.lsp.buf.implementation, "[G]oto [I]mplementation")
 					map("gy", vim.lsp.buf.type_definition, "[G]oto [T]ype Definition")
@@ -487,111 +313,87 @@ require("lazy").setup({
 					map("<leader>rn", vim.lsp.buf.rename, "[R]e[n]ame")
 					map("<leader>ca", vim.lsp.buf.code_action, "[C]ode [A]ction")
 					map("K", vim.lsp.buf.hover, "Hover Documentation")
-					map("<C-k>", vim.lsp.buf.signature_help, "Signature Documentation")
 				end,
 			})
 
-			-- Configure individual servers using vim.lsp.config()
-			vim.lsp.config("lua_ls", {
-				settings = {
-					Lua = {
-						completion = { callSnippet = "Replace" },
-						runtime = { version = "LuaJIT" },
-						diagnostics = {
-							disable = { "trailing-space", "missing-fields" },
-						},
-						workspace = {
-							checkThirdParty = false,
-							library = vim.api.nvim_get_runtime_file("lua", true),
-						},
-						doc = { privateName = { "^_" } },
-						telemetry = { enable = false },
-					},
-				},
+			-- Diagnostics UI
+			vim.diagnostic.config({
+				virtual_text = true,
+				signs = true,
+				underline = true,
+				update_in_insert = false,
+				severity_sort = true,
+				float = { border = "rounded" },
 			})
+			vim.lsp.handlers.hover = { border = "rounded", max_width = 80 }
+			vim.lsp.handlers.signature_help = { border = "rounded", max_width = 80 }
 
-			vim.lsp.config("pyright", {})
+			-- Base config function
+			local function get_opts(server_opts)
+				return vim.tbl_deep_extend("force", { capabilities = capabilities }, server_opts or {})
+			end
 
-			vim.lsp.config("ruff", {
-				init_options = { settings = { lineLength = 80 } },
-				on_attach = function(client, bufnr)
-					client.server_capabilities.documentFormattingProvider = false
-					client.server_capabilities.documentRangeFormattingProvider = false
-				end,
-			})
-
-			vim.lsp.config("r_language_server", {
-				settings = {
-					r = {
-						lsp = {
-							rich_documentation = true,
-							diagnostics = true,
-							lint = { linters = "lintr::default_linters" },
+			-- Configure servers
+			vim.lsp.config(
+				"lua_ls",
+				get_opts({
+					settings = {
+						Lua = {
+							completion = { callSnippet = "Replace" },
+							runtime = { version = "LuaJIT" },
+							diagnostics = { disable = { "trailing-space", "missing-fields" } },
+							workspace = {
+								checkThirdParty = false,
+								library = vim.api.nvim_get_runtime_file("lua", true),
+							},
+							doc = { privateName = { "^_" } },
+							telemetry = { enable = false },
 						},
 					},
-				},
-			})
+				})
+			)
 
-			vim.lsp.config("rust_analyzer", {
-				settings = { ["rust-analyzer"] = { diagnostics = { enable = true } } },
-			})
+			vim.lsp.config("pyright", get_opts())
 
-			vim.lsp.config("html", {})
-			vim.lsp.config("yamlls", {
-				settings = { yaml = { schemaStore = { enable = true, url = "" } } },
-			})
-			vim.lsp.config("jsonls", {})
-			vim.lsp.config("taplo", {})
+			vim.lsp.config(
+				"ruff",
+				get_opts({
+					init_options = { settings = { lineLength = 80 } },
+				})
+			)
+
+			vim.lsp.config(
+				"rust_analyzer",
+				get_opts({
+					settings = { ["rust-analyzer"] = { diagnostics = { enable = true } } },
+				})
+			)
+
+			vim.lsp.config("html", get_opts())
+
+			vim.lsp.config(
+				"yamlls",
+				get_opts({
+					settings = { yaml = { schemaStore = { enable = true, url = "" } } },
+				})
+			)
+
+			vim.lsp.config("jsonls", get_opts())
+			vim.lsp.config("taplo", get_opts())
 
 			-- Enable all configured servers
-			vim.lsp.enable("lua_ls")
-			vim.lsp.enable("pyright")
-			vim.lsp.enable("ruff")
-			vim.lsp.enable("r_language_server")
-			vim.lsp.enable("rust_analyzer")
-			vim.lsp.enable("html")
-			vim.lsp.enable("yamlls")
-			vim.lsp.enable("jsonls")
-			vim.lsp.enable("taplo")
-
-			-- Formatting: stevearc/conform.nvim
-			require("conform").setup({
-				formatters_by_ft = {
-					python = { "ruff_format" },
-					lua = { "stylua" },
-					json = { "jq" },
-					yaml = { "prettier" },
-					html = { "prettier" },
-					toml = { "taplo" },
-				},
-				formatters = {
-					ruff_format = {},
-					stylua = {},
-					jq = {},
-					prettier = {},
-					taplo = {},
-				},
+			vim.lsp.enable({
+				"lua_ls",
+				"pyright",
+				"ruff",
+				"rust_analyzer",
+				"html",
+				"yamlls",
+				"jsonls",
+				"taplo",
 			})
 
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				pattern = "*",
-				callback = function(args)
-					require("conform").format({
-						bufnr = args.buf,
-						lsp_fallback = true,
-						timeout_ms = 2000,
-					})
-				end,
-			})
-
-			vim.keymap.set({ "n", "v" }, "<leader>lf", function()
-				require("conform").format({
-					lsp_fallback = true,
-					timeout_ms = 2000,
-				})
-			end, { desc = "[L]SP [F]ormat" })
-
-			-- Mason setup
+			-- Mason
 			require("mason").setup({
 				ui = {
 					icons = {
@@ -603,49 +405,30 @@ require("lazy").setup({
 			})
 
 			require("mason-lspconfig").setup({
-				automatic_installation = true,
-				automatic_enable = false, -- We're handling enable with vim.lsp.enable()
-				ensure_installed = {
-					"lua_ls",
-					"pyright",
-					"ruff",
-					"r_language_server",
-					"rust_analyzer",
-					"html",
-					"yamlls",
-					"jsonls",
-					"taplo",
-				},
+				ensure_installed = { "lua_ls", "pyright", "ruff", "rust_analyzer", "html", "yamlls", "jsonls", "taplo" },
 			})
 
 			require("mason-tool-installer").setup({
-				ensure_installed = {
-					"ruff",
-					"stylua",
-					"isort",
-					"tree-sitter-cli",
-					"r-languageserver",
-				},
+				ensure_installed = { "ruff", "stylua", "isort", "tree-sitter-cli" },
 				auto_update = true,
 			})
 
-			-- LSP UI/diagnostics
-			vim.lsp.handlers.hover = {
-				border = "rounded",
-				max_width = 80,
-			}
-			vim.lsp.handlers.signature_help = {
-				border = "rounded",
-				max_width = 80,
-			}
-			vim.diagnostic.config({
-				virtual_text = true,
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-				severity_sort = true,
-				float = { border = "rounded" },
+			-- Conform formatting
+			require("conform").setup({
+				formatters_by_ft = {
+					python = { "ruff_format" },
+					lua = { "stylua" },
+					json = { "jq" },
+					yaml = { "prettier" },
+					html = { "prettier" },
+					toml = { "taplo" },
+				},
+				format_on_save = { timeout_ms = 2000, lsp_fallback = true },
 			})
+
+			vim.keymap.set({ "n", "v" }, "<leader>lf", function()
+				require("conform").format({ lsp_fallback = true, timeout_ms = 2000 })
+			end, { desc = "[L]SP [F]ormat" })
 		end,
 	},
 	{ -- highlight markdown headings and code blocks etc.
@@ -718,7 +501,7 @@ require("lazy").setup({
 			local input = vim.fn.input("Quick Chat: ")
 			if input ~= "" then
 				require("CopilotChat").ask(input, {
-					selection = require("CopilotChat.select").buffer,
+					selection = require("CopilotChat.selection").buffer,
 				})
 			end
 		end, { desc = "CopilotChat - Quick chat" }),
@@ -862,7 +645,7 @@ require("lazy").setup({
 
 		-- You can also specify a list of valid jump keywords
 
-		vim.keymap.set("n", "]t", function()
+		vim.keymap.set("n", "<leader>]t", function()
 			require("todo-comments").jump_next({ keywords = { "ERROR", "WARNING" } })
 		end, { desc = "Next error/warning todo comment" }),
 	},
@@ -967,16 +750,16 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>a", function()
 				harpoon:list():add()
 			end, { desc = "add file to harpoon list" })
-			vim.keymap.set("n", "<C-j>", function()
+			vim.keymap.set("n", "<m-j>", function()
 				harpoon:list():select(1)
 			end)
-			vim.keymap.set("n", "<C-k>", function()
+			vim.keymap.set("n", "<m-k>", function()
 				harpoon:list():select(2)
 			end)
-			vim.keymap.set("n", "<C-l>", function()
+			vim.keymap.set("n", "<m-l>", function()
 				harpoon:list():select(3)
 			end)
-			vim.keymap.set("n", "<C-;>", function()
+			vim.keymap.set("n", "<m-h>", function()
 				harpoon:list():select(4)
 			end)
 			vim.keymap.set("n", "<C-S-P>", function()
@@ -1022,119 +805,15 @@ require("lazy").setup({
 				"<cmd>Trouble diagnostics toggle<CR>",
 				desc = "Diagnostics (Trouble)",
 			},
-		},
-	},
-
-	-- Quarto, Otter, Jupytext, Slime, etc. (Python/R/Quarto integration)
-	{
-		"quarto-dev/quarto-nvim",
-		ft = { "quarto" },
-		opts = {},
-		dependencies = { "jmbuhr/otter.nvim" },
-		config = function(_, opts)
-			require("quarto").setup(opts)
-		end, -- Ensure setup is called
-	},
-	{
-		"GCBallesteros/jupytext.nvim",
-		enabled = true,
-		opts = {
-			custom_language_formatting = {
-				python = {
-					extension = "qmd",
-					style = "quarto",
-					force_ft = "quarto",
-				},
-				r = {
-					extension = "qmd",
-					style = "quarto",
-					force_ft = "quarto",
-				},
+			{
+				"<leader>xq",
+				"<cmd>Trouble quickfix toggle<CR>",
+				desc = "Quickfix (Trouble)",
 			},
 		},
-		config = function(_, opts)
-			require("jupytext").setup(opts)
-		end,
 	},
-	{
-		"jpalardy/vim-slime",
-		enabled = true,
-		init = function()
-			-- This Lua function will be called from Vimscript to check the context.
-			-- It needs to be global for v:lua to access it.
-			_G.SlimeHelper_is_otter_python_context = function()
-				local otter_ok, otter_tools = pcall(require, "otter.tools.functions")
-				if otter_ok then
-					return otter_tools.is_otter_language_context("python")
-				end
-				-- Silently return false if otter is not available or errors.
-				-- A vim.notify could be added here for debugging if needed.
-				return false
-			end
-
-			local vimscript_block = [[
-let g:slime_dispatch_ipython_pause = 100
-function! SlimeOverride_EscapeText_quarto(text)
-  " Update the buffer-local variable with the current context from Lua
-  let b:quarto_is_python_chunk = v:lua.SlimeHelper_is_otter_python_context()
-
-  if exists('g:slime_python_ipython') && len(split(a:text, '\n')) > 1 && b:quarto_is_python_chunk && !(exists('b:quarto_is_r_mode') && b:quarto_is_r_mode)
-    return ['%cpaste -q\n', g:slime_dispatch_ipython_pause, a:text, '--', '\n']
-  elseif exists('b:quarto_is_r_mode') && b:quarto_is_r_mode && b:quarto_is_python_chunk " R mode trying to send Python (e.g. reticulate)
-    return [a:text, '\n'] " Or specific handling for reticulate if different
-  else " Default, or non-Python chunk in Quarto, or not a Quarto file
-    return [a:text]
-  endif
-endfunction
-]]
-			-- Use nvim_exec to define the Vimscript function. It handles multi-line strings well.
-			vim.cmd(vimscript_block)
-
-			vim.g.slime_target = "neovim"
-			vim.g.slime_no_mappings = true
-			vim.g.slime_python_ipython = 1 -- Default to Python/IPython if available
-		end,
-		config = function()
-			-- These settings are applied after the plugin loads
-			vim.g.slime_input_pid = false
-			vim.g.slime_suggest_default = true
-			vim.g.slime_menu_config = false
-			vim.g.slime_neovim_ignore_unlisted = true
-
-			local function mark_terminal()
-				local job_id = vim.b.terminal_job_id
-				vim.print("job_id: " .. job_id)
-			end
-			local function set_terminal()
-				vim.fn.call("slime#config", {})
-			end
-			vim.keymap.set("n", "<leader>cm", mark_terminal, { desc = "[m]ark terminal" })
-			vim.keymap.set("n", "<leader>cs", set_terminal, { desc = "[s]et terminal" })
-		end,
-	},
-	{
-		"HakonHarnes/img-clip.nvim",
-		event = "BufEnter",
-		ft = { "markdown", "quarto", "latex" },
-		opts = {
-			default = { dir_path = "img" },
-			filetypes = {
-				markdown = {
-					url_encode_path = true,
-					template = "![$CURSOR]($FILE_PATH)",
-					drag_and_drop = { download_images = false },
-				},
-				quarto = { url_encode_path = true, template = "![$CURSOR]($FILE_PATH)" },
-			},
-		},
-		config = function(_, opts)
-			require("img-clip").setup(opts)
-		end,
-	},
-
 	{
 		"mbbill/undotree",
-
 		config = function()
 			vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
 		end,
@@ -1164,264 +843,16 @@ endfunction
 				},
 			})
 		end,
-	},
-	-- nvim dap DAP (debugger)
-	{
-		{
-			"mfussenegger/nvim-dap",
-			lazy = false,
-			config = function()
-				local dap = require("dap")
-				dap.set_log_level("DEBUG")
-
-				vim.keymap.set("n", "<F8>", dap.continue, { desc = "Debug: Continue" })
-				vim.keymap.set("n", "<F10>", dap.step_over, { desc = "Debug: Step Over" })
-				vim.keymap.set("n", "<F11>", dap.step_into, { desc = "Debug: Step Into" })
-				vim.keymap.set("n", "<F12>", dap.step_out, { desc = "Debug: Step Out" })
-				vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint, { desc = "Debug: Toggle Breakpoint" })
-				vim.keymap.set("n", "<leader>B", function()
-					dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
-				end, { desc = "Debug: Set Conditional Breakpoint" })
-			end,
-		},
-
-		{
-			"rcarriga/nvim-dap-ui",
-			dependencies = { "mfussenegger/nvim-dap", "nvim-neotest/nvim-nio" },
-			config = function()
-				local dap = require("dap")
-				local dapui = require("dapui")
-				local function layout(name)
-					return {
-						elements = {
-							{ id = name },
-						},
-						enter = true,
-						size = 40,
-						position = "right",
-					}
-				end
-				local name_to_layout = {
-					repl = { layout = layout("repl"), index = 0 },
-					stacks = { layout = layout("stacks"), index = 0 },
-					scopes = { layout = layout("scopes"), index = 0 },
-					console = { layout = layout("console"), index = 0 },
-					watches = { layout = layout("watches"), index = 0 },
-					breakpoints = { layout = layout("breakpoints"), index = 0 },
-				}
-				local layouts = {}
-
-				for name, config in pairs(name_to_layout) do
-					table.insert(layouts, config.layout)
-					name_to_layout[name].index = #layouts
-				end
-
-				local function toggle_debug_ui(name)
-					dapui.close()
-					local layout_config = name_to_layout[name]
-
-					if layout_config == nil then
-						error(string.format("bad name: %s", name))
-					end
-
-					local uis = vim.api.nvim_list_uis()[1]
-					if uis ~= nil then
-						layout_config.size = uis.width
-					end
-
-					pcall(dapui.toggle, layout_config.index)
-				end
-
-				vim.keymap.set("n", "<leader>dr", function()
-					toggle_debug_ui("repl")
-				end, { desc = "Debug: toggle repl ui" })
-				vim.keymap.set("n", "<leader>ds", function()
-					toggle_debug_ui("stacks")
-				end, { desc = "Debug: toggle stacks ui" })
-				vim.keymap.set("n", "<leader>dw", function()
-					toggle_debug_ui("watches")
-				end, { desc = "Debug: toggle watches ui" })
-				vim.keymap.set("n", "<leader>db", function()
-					toggle_debug_ui("breakpoints")
-				end, { desc = "Debug: toggle breakpoints ui" })
-				vim.keymap.set("n", "<leader>dS", function()
-					toggle_debug_ui("scopes")
-				end, { desc = "Debug: toggle scopes ui" })
-				vim.keymap.set("n", "<leader>dc", function()
-					toggle_debug_ui("console")
-				end, { desc = "Debug: toggle console ui" })
-
-				vim.api.nvim_create_autocmd("BufEnter", {
-					group = "DapGroup",
-					pattern = "*dap-repl*",
-					callback = function()
-						vim.wo.wrap = true
-					end,
-				})
-
-				vim.api.nvim_create_autocmd("BufWinEnter", create_nav_options("dap-repl"))
-				vim.api.nvim_create_autocmd("BufWinEnter", create_nav_options("DAP Watches"))
-
-				dapui.setup({
-					layouts = layouts,
-					enter = true,
-				})
-
-				dap.listeners.before.event_terminated.dapui_config = function()
-					dapui.close()
-				end
-				dap.listeners.before.event_exited.dapui_config = function()
-					dapui.close()
-				end
-
-				dap.listeners.after.event_output.dapui_config = function(_, body)
-					if body.category == "console" then
-						dapui.eval(body.output) -- Sends stdout/stderr to Console
-					end
-				end
-			end,
-		},
-
-		{
-			"jay-babu/mason-nvim-dap.nvim",
-			dependencies = {
-				"williamboman/mason.nvim",
-				"mfussenegger/nvim-dap",
-				"neovim/nvim-lspconfig",
-			},
-			config = function()
-				require("mason-nvim-dap").setup({
-					ensure_installed = {
-						"debugpy",
-						"local-lua-debugger-vscode",
-					},
-					automatic_installation = true,
-					handlers = {
-						function(config)
-							require("mason-nvim-dap").default_setup(config)
-						end,
-						delve = function(config)
-							table.insert(config.configurations, 1, {
-								args = function()
-									return vim.split(vim.fn.input("args> "), " ")
-								end,
-								type = "delve",
-								name = "file",
-								request = "launch",
-								program = "${file}",
-								outputMode = "remote",
-							})
-							table.insert(config.configurations, 1, {
-								args = function()
-									return vim.split(vim.fn.input("args> "), " ")
-								end,
-								type = "delve",
-								name = "file args",
-								request = "launch",
-								program = "${file}",
-								outputMode = "remote",
-							})
-							require("mason-nvim-dap").default_setup(config)
-						end,
-					},
-				})
-			end,
-		},
+		vim.keymap.set("n", "<leader>cl", ":CloackToggle<CR>", { desc = "Toggle Cloak.nvim" }),
 	},
 	-- git signs
 	{ "lewis6991/gitsigns.nvim" },
-	-- vim fugitive (git related)
-	{
-		"tpope/vim-fugitive",
-		config = function()
-			vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
-
-			local ThePrimeagen_Fugitive = vim.api.nvim_create_augroup("ThePrimeagen_Fugitive", {})
-
-			local autocmd = vim.api.nvim_create_autocmd
-			autocmd("BufWinEnter", {
-				group = ThePrimeagen_Fugitive,
-				pattern = "*",
-				callback = function()
-					if vim.bo.ft ~= "fugitive" then
-						return
-					end
-
-					local bufnr = vim.api.nvim_get_current_buf()
-					local opts = { buffer = bufnr, remap = false }
-					vim.keymap.set("n", "<leader>p", function()
-						vim.cmd.Git("push")
-					end, opts)
-
-					-- rebase always
-					vim.keymap.set("n", "<leader>P", function()
-						vim.cmd.Git({ "pull", "--rebase" })
-					end, opts)
-
-					-- NOTE: It allows me to easily set the branch i am pushing and any tracking
-					-- needed if i did not set the branch up correctly
-					-- vim.keymap.set("n", "<leader>t", ":Git push -u origin ", opts)
-				end,
-			})
-
-			vim.keymap.set("n", "gu", "<cmd>diffget //2<CR>")
-			vim.keymap.set("n", "gh", "<cmd>diffget //3<CR>")
-		end,
-	},
-	-- Zen mode (not to be confused with mini.zen though similar)
-
-	{
-		"folke/zen-mode.nvim",
-		config = function()
-			vim.keymap.set("n", "<leader>zz", function()
-				require("zen-mode").setup({
-					window = {
-						width = 90,
-						options = {},
-					},
-				})
-				require("zen-mode").toggle()
-				vim.wo.wrap = false
-				vim.wo.number = true
-				vim.wo.rnu = true
-				ColorMyPencils()
-			end)
-
-			vim.keymap.set("n", "<leader>zZ", function()
-				require("zen-mode").setup({
-					window = {
-						width = 80,
-						options = {},
-					},
-				})
-				require("zen-mode").toggle()
-				vim.wo.wrap = false
-				vim.wo.number = false
-				vim.wo.rnu = false
-				vim.opt.colorcolumn = "0"
-				ColorMyPencils()
-			end)
-		end,
-	},
 	{
 		"christoomey/vim-tmux-navigator",
 		vim.keymap.set("n", "<C-S-h>", ":TmuxNavigateLeft<CR>"),
 		vim.keymap.set("n", "<C-S-j>", ":TmuxNavigateDown<CR>"),
 		vim.keymap.set("n", "<C-S-k>", ":TmuxNavigateUp<CR>"),
 		vim.keymap.set("n", "<C-S-l>", ":TmuxNavigateRight<CR>"),
-	},
-	-- vim-test and vimux
-	{
-		"vim-test/vim-test",
-		dependencies = {
-			"preservim/vimux",
-		},
-		vim.keymap.set("n", "<leader>Tn", ":TestNearest<CR>", { desc = "Run nearest test" }),
-		vim.keymap.set("n", "<leader>Tf", ":TestFile<CR>", { desc = "Run tests in file" }),
-		vim.keymap.set("n", "<leader>Ts", ":TestSuite<CR>", { desc = "Run test suite" }),
-		vim.keymap.set("n", "<leader>Tl", ":TestLast<CR>", { desc = "Run last test" }),
-		vim.keymap.set("n", "<leader>Tv", ":TestVisit<CR>", { desc = "Visit test file" }),
-		vim.cmd("let test#strategy = 'vimux'"),
 	},
 	{
 		"kdheepak/lazygit.nvim",
@@ -1471,51 +902,13 @@ endfunction
 		config = function()
 			vim.defer_fn(function()
 				local wk = require("which-key")
-				wk.setup({
-					-- Add any specific which-key options here, e.g.:
-					-- window = { border = "rounded", winblend = 0 },
-					-- layout = { spacing = 6 },
-				})
+				wk.setup({})
 
 				-- Your which-key mappings, moved here
 				-- Ensure helper functions are accessible (they are global in your config)
-				wk.add({
-					{ "<c-LeftMouse>", "<cmd>lua vim.lsp.buf.definition()<CR>", desc = "go to definition" },
-					{ "<c-q>", "<cmd>q<cr>", desc = "close buffer" },
-					{ "<cm-i>", insert_py_chunk, desc = "python code chunk" },
-					{ "<m-I>", insert_py_chunk, desc = "python code chunk" },
-					{ "<m-i>", insert_r_chunk, desc = "r code chunk" },
-				}, { mode = "n", silent = true })
-
-				wk.add({
-					{ mode = { "v" }, { "<cr>", send_region, desc = "run code region" } },
-				})
 
 				wk.add({
 					{
-						mode = { "i" },
-						{ "<cm-i>", insert_py_chunk, desc = "python code chunk" },
-						{ "<C-->", " <- ", desc = "assign" },
-						{ "<m-I>", insert_py_chunk, desc = "python code chunk" },
-						{ "<m-i>", insert_r_chunk, desc = "r code chunk" },
-					},
-				}, { mode = "i" })
-
-				wk.add({
-					{
-						{ "<leader><cr>", send_cell, desc = "run code cell" },
-						{ "<leader>c", group = "[c]ode / [c]ell / [c]hunk" },
-						{
-							"<leader>ci",
-							new_terminal_ipython,
-							desc = "new [i]python terminal",
-						},
-						-- {
-						-- 	"<leader>cp",
-						-- 	new_terminal_python,
-						-- 	desc = "new [p]ython terminal",
-						-- },
-						{ "<leader>cr", new_terminal_r, desc = "new [R] terminal" },
 						{ "<leader>f<space>", "<cmd>Telescope buffers<cr>", desc = "[ ] buffers" },
 						{ "<leader>fc", "<cmd>Telescope git_commits<cr>", desc = "git [c]ommits" },
 						{ "<leader>fj", "<cmd>Telescope jumplist<cr>", desc = "[j]umplist" },
@@ -1527,13 +920,6 @@ endfunction
 							vim.diagnostic.open_float,
 							desc = "diagnostics (show hover [e]rror)",
 						},
-						{
-							"<leader>op",
-							insert_py_chunk,
-							desc = "[p]ython code chunk",
-						},
-						{ "<leader>or", insert_r_chunk, desc = "[r] code chunk" },
-						{ "<leader>qp", ":lua require'quarto'.quartoPreview()<cr>", desc = "[p]review" },
 					},
 				}, { mode = "n" })
 			end, 100) -- Defer slightly to ensure other things are loaded
@@ -1549,24 +935,12 @@ end
 -- 3. KEYMAPS & AUTOCMDS
 -- =====================
 
--- Function to show current git branch using fidget.nvim
-local function show_git_branch()
-	local branch = vim.fn.systemlist("git branch --show-current")[1] or ""
-	if branch == "" then
-		require("fidget").notify("Not in a git repository", vim.log.levels.INFO, { title = "Git Branch" })
-	else
-		require("fidget").notify("Current branch: " .. branch, vim.log.levels.INFO, { title = "Git Branch" })
-	end
-end
 -- Keymap: <leader>br to show current git branch
 vim.keymap.set("n", "<leader>gb", ":Telescope git_branches<CR>", { desc = "Show git branches" })
 
 -- Helper functions for basic keymaps (if not used by which-key, can stay here)
 local nmap = function(key, effect)
 	vim.keymap.set("n", key, effect, { silent = true, noremap = true })
-end
-local imap = function(key, effect)
-	vim.keymap.set("i", key, effect, { silent = true, noremap = true })
 end
 
 -- Basic keymaps (not managed by which-key)
@@ -1589,8 +963,8 @@ vim.keymap.set("n", "<space><space>x", "<cmd>source %<CR>", { desc = "source cur
 vim.keymap.set(
 	"n",
 	"<space><space>c",
-	"<cmd>source ~/.config/nvim/init2.lua<CR>",
-	{ desc = "source file: neovim init2.lua" }
+	"<cmd>source ~/.dotfiles/config/nvim/init.lua<CR>",
+	{ desc = "source file: neovim init.lua" }
 )
 vim.keymap.set("n", "<space>x", ":lua vim.cmd('.lua')<CR>", { desc = "execute current line" }) -- Corrected to execute current line as Lua
 vim.keymap.set(
@@ -1600,10 +974,6 @@ vim.keymap.set(
 	{ desc = "execute current selection as Lua" }
 ) -- More robust visual selection execution
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
-vim.keymap.set("n", "<C-S-h>", "<C-w><C-h>")
-vim.keymap.set("n", "<C-S-l>", "<C-w><C-l>")
-vim.keymap.set("n", "<C-S-j>", "<C-w><C-j>")
-vim.keymap.set("n", "<C-S-k>", "<C-w><C-k>")
 vim.keymap.set("i", "<m-m>", "|>", { desc = "insert pipe operator" })
 vim.keymap.set("v", ">", ">gv")
 vim.keymap.set("v", "<", "<gv")
@@ -1675,63 +1045,70 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.notify("ft_settings applied", vim.log.levels.INFO)
 	end,
 })
-vim.api.nvim_create_autocmd("FileType", {
-	group = ft_settings,
-	pattern = "python",
-	callback = function()
-		vim.b.slime_cell_delimiter = "#\\s\\=%%"
-		vim.notify("Python ft_settings applied", vim.log.levels.INFO)
-	end,
-})
 
 -- =====================
 -- Fidget Messages to Buffer
 -- =====================
 -- Function to open Fidget notification history in a buffer
-local function fidget_history_to_buffer()
-	local lines = { "=== Fidget Notification History ===" }
-	table.insert(lines, "")
-	table.insert(lines, "Note: This shows current LSP progress notifications")
-	table.insert(lines, "")
-	table.insert(lines, "Fidget displays LSP progress in real-time.")
-	table.insert(lines, "To capture messages, check:")
-	table.insert(lines, "  - :messages (Vim messages)")
-	table.insert(lines, "  - :Telescope notifications (if using nvim-notify)")
-	table.insert(lines, "")
-	table.insert(lines, "Run an LSP action to see progress updates.")
+local function show_messages()
+	local output = vim.fn.execute("messages")
+	local lines = vim.split(output, "\n", { plain = true })
 
-	-- Create a new split at the bottom
-	vim.cmd("botright new")
+	-- make sure we always have at least one line to display
+	if #lines == 0 then
+		lines = { "" }
+	end
 
-	-- Set buffer options
-	local buf = vim.api.nvim_get_current_buf()
-	vim.api.nvim_buf_set_option(buf, "buftype", "nofile")
-	vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
-	vim.api.nvim_buf_set_option(buf, "swapfile", false)
-	vim.api.nvim_buf_set_name(buf, "Fidget Info")
-
-	-- Set the lines
+	-- create a scratch buffer
+	local buf = vim.api.nvim_create_buf(false, true)
+	vim.api.nvim_buf_call(buf, function()
+		vim.opt_local.bufhidden = "wipe"
+		vim.opt_local.buftype = "nofile"
+		vim.opt_local.swapfile = false
+	end)
 	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 
-	-- Make it read-only
-	vim.api.nvim_buf_set_option(buf, "modifiable", false)
-	vim.api.nvim_buf_set_option(buf, "readonly", true)
+	-- get UI dims
+	local ui = vim.api.nvim_list_uis()[1]
+	local max_len = 0
+	for _, l in ipairs(lines) do
+		max_len = math.max(max_len, #l)
+	end
 
-	-- Set height
-	local height = math.min(#lines, 12)
-	vim.cmd("resize " .. height)
+	-- compute unclamped size
+	local want_w = max_len
+	local want_h = #lines
 
-	-- Add keymaps
-	vim.keymap.set("n", "q", ":q<CR>", { buffer = buf, silent = true })
-	vim.keymap.set("n", "<Esc>", ":q<CR>", { buffer = buf, silent = true })
+	-- clamp to screen with a minimum of 1
+	local width = math.max(1, math.min(want_w, ui.width - 4))
+	local height = math.max(1, math.min(want_h, ui.height / 2))
+
+	local row = math.floor((ui.height - height) / 2)
+	local col = math.floor((ui.width - width) / 2)
+
+	local win = vim.api.nvim_open_win(buf, true, {
+		relative = "editor",
+		row = row,
+		col = col,
+		width = width,
+		height = height,
+		style = "minimal",
+		border = "rounded",
+	})
+
+	-- disable wrap
+	vim.api.nvim_win_call(win, function()
+		vim.wo.wrap = false
+	end)
+
+	-- close on <q>
+	vim.keymap.set("n", "q", "<cmd>close<CR>", { buffer = buf, silent = true })
 end
 
--- Create command
-vim.api.nvim_create_user_command("FidgetHistory", fidget_history_to_buffer, {})
-
--- Keymap with your preferred shortcut
-vim.keymap.set("n", "<leader>mf", fidget_history_to_buffer, { desc = "Fidget info in buffer" })
-
+vim.api.nvim_create_user_command("Messages", show_messages, {
+	desc = "Show :messages output in a floating window",
+})
+vim.keymap.set("n", "<leader>n", show_messages, { desc = "Show :messages output" })
 -- =====================
 -- 4. Floaterminal
 -- =====================
@@ -1826,12 +1203,12 @@ local function toggle_bottom_terminal()
 		row = vim.o.lines - height - 2,
 		col = 0,
 		style = "minimal",
-		border = "single",
+		border = { "", "═", "", "", "", "", "", "" },
 	})
 
 	-- Start terminal if not already started
 	if vim.bo[bottom_term.buf].buftype ~= "terminal" then
-		vim.fn.termopen(vim.o.shell)
+		vim.cmd("terminal")
 	end
 
 	vim.cmd("startinsert")
@@ -1839,96 +1216,3 @@ end
 
 vim.api.nvim_create_user_command("BottomTerm", toggle_bottom_terminal, {})
 vim.keymap.set({ "n", "t", "i" }, "<space>--", toggle_bottom_terminal, { desc = "toggle bottom terminal" })
-
--- =====================
--- 5. PYTHON/QUARTO/CHUNK HELPERS
--- =====================
--- These functions are defined globally and used by which-key mappings and vim-slime
-vim.g["quarto_is_r_mode"] = nil
-vim.g["reticulate_running"] = false
-
-function send_cell() -- Made global for which-key
-	if vim.b["quarto_is_r_mode"] == nil then
-		vim.fn["slime#send_cell"]()
-		return
-	end
-	if vim.b["quarto_is_r_mode"] == true then
-		vim.g.slime_python_ipython = 0
-		local is_python = require("otter.tools.functions").is_otter_language_context("python")
-		if is_python and not vim.b["reticulate_running"] then
-			vim.fn["slime#send"]("reticulate::repl_python()" .. "\r")
-			vim.b["reticulate_running"] = true
-		end
-		if not is_python and vim.b["reticulate_running"] then
-			vim.fn["slime#send"]("exit" .. "\r")
-			vim.b["reticulate_running"] = false
-		end
-		vim.fn["slime#send_cell"]()
-	end
-end
-
-local slime_send_region_cmd_str = ":<C-u>call slime#send_op(visualmode(), 1)<CR>"
-local slime_send_region_cmd_termcodes = vim.api.nvim_replace_termcodes(slime_send_region_cmd_str, true, false, true)
-function send_region() -- Made global
-	if vim.bo.filetype ~= "quarto" or vim.b["quarto_is_r_mode"] == nil then
-		vim.cmd("normal!" .. slime_send_region_cmd_termcodes)
-		return
-	end
-	if vim.b["quarto_is_r_mode"] == true then
-		vim.g.slime_python_ipython = 0
-		local is_python = require("otter.tools.functions").is_otter_language_context("python")
-		if is_python and not vim.b["reticulate_running"] then
-			vim.fn["slime#send"]("reticulate::repl_python()" .. "\r")
-			vim.b["reticulate_running"] = true
-		end
-		if not is_python and vim.b["reticulate_running"] then
-			vim.fn["slime#send"]("exit" .. "\r")
-			vim.b["reticulate_running"] = false
-		end
-		vim.cmd("normal!" .. slime_send_region_cmd_termcodes)
-	end
-end
-
-function is_code_chunk() -- Made global
-	local current_ctx_ok, otter_keeper = pcall(require, "otter.keeper")
-	if not current_ctx_ok then
-		return false
-	end
-	local current, _ = otter_keeper.get_current_language_context()
-	return current ~= nil
-end
-
-function insert_code_chunk(lang) -- Made global
-	vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<esc>", true, false, true), "n", true)
-	local keys
-	if is_code_chunk() then
-		keys = [[o```<cr><cr>```{]] .. lang .. [[}<esc>o]]
-	else
-		keys = [[o```{]] .. lang .. [[}<cr>```<esc>O]]
-	end
-	keys = vim.api.nvim_replace_termcodes(keys, true, false, true)
-	vim.api.nvim_feedkeys(keys, "n", false)
-end
-
-function insert_r_chunk()
-	insert_code_chunk("r")
-end -- Made global
-
-function insert_py_chunk()
-	insert_code_chunk("python")
-end -- Made global
-
-local function new_terminal(lang)
-	vim.cmd("vsplit term://" .. lang)
-end -- This can stay local if only used by the next functions
-function new_terminal_python()
-	new_terminal("python")
-end -- Made global
-
-function new_terminal_r()
-	new_terminal("R --no-save")
-end -- Made global
-
-function new_terminal_ipython()
-	new_terminal("ipython --no-confirm-exit")
-end -- Made global

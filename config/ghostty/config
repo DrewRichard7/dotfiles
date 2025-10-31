@@ -13,8 +13,9 @@ confirm-close-surface=false
 # theme = rose-pine-moon
 # theme = Rose Pine
 # theme = "easy-eyes"
-theme = Kanagawa Wave
+# theme = Kanagawa Wave
 # theme = Kanagawa Dragon
+theme = Gruvbox Material Dark
 # cursor features
 shell-integration-features = no-cursor
 cursor-color = 97E5F5
